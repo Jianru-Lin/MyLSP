@@ -1,0 +1,3 @@
+LIBRARY    MyLSP64
+EXPORTS   
+    WSPStartup
