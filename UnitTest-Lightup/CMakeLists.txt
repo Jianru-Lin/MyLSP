@@ -4,34 +4,25 @@ add_definitions (
 	-D_UNICODE
 	-DUNICODE )
 
-if (CMAKE_CL_64)
-	set (
-		UnitTest-Lightup
-		UnitTest-Lightup64 )
-	set (
-		Lightup
-		Lightup64 )
-else (CMAKE_CL_64)
-	set (
-		UnitTest-Lightup
-		UnitTest-Lightup )
-	set (
-		Lightup
-		Lightup )
-endif (CMAKE_CL_64)
+# come from gtest's file: internal_utils.cmake
+foreach (flag_var
+         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+         CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+    string(REPLACE "/MD" "-MT" ${flag_var} "${${flag_var}}")
+endforeach()
 
 
 add_executable (
-	${UnitTest-Lightup}
+	UnitTest-Lightup
 	main.cpp )
 
 target_link_libraries (
-	${UnitTest-Lightup}
+	UnitTest-Lightup
 	advapi32
 	iphlpapi
 	psapi
 	shell32
 	ws2_32
-	${Lightup}
+	Lightup
 	gtest 
 	gtest_main )

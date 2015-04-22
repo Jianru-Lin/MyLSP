@@ -1,31 +1,9 @@
 include_directories (
 	../Lightup/include )
 
-if (CMAKE_CL_64)
-	set (
-		MyLSP
-		MyLSP64 )
-	set (
-		Lightup
-		Lightup64 )
-	set (
-		ModuleDef
-		src/module64.def )
-else (CMAKE_CL_64)
-	set (
-		MyLSP
-		MyLSP )
-	set (
-		Lightup
-		Lightup )
-	set (
-		ModuleDef
-		src/module.def )
-endif (CMAKE_CL_64)
-
 set (
 	MyLSP_src
-	${ModuleDef}
+	src/module.def
 	src/Global.h
 	src/Global.cpp
 	src/DllMain.cpp
@@ -63,10 +41,10 @@ set (
 
 
 add_library (
-	${MyLSP} 
+	MyLSP 
 	SHARED
 	${MyLSP_src} )
 
 target_link_libraries (
-	${MyLSP}
-	${Lightup} )
+	MyLSP 
+	Lightup )
