@@ -12,7 +12,8 @@ add_definitions (
 add_executable (
 	UnitTest-Lightup
 	Buffer.cpp 
-	CriticalSection.cpp )
+	CriticalSection.cpp
+	EasyWSCEnumProtocols.cpp )
 
 target_link_libraries (
 	UnitTest-Lightup

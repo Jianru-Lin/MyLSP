@@ -6,3 +6,4 @@
 
 #include "../src/Buffer.h"
 #include "../src/CriticalSection.h"
+#include "../src/EasyWSCEnumProtocols.h"
