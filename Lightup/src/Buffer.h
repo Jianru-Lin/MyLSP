@@ -11,6 +11,7 @@ public:
 
 private:
 	char* p;
+	SIZE_T len;
 
 public:
 	static char* Alloc(SIZE_T length);

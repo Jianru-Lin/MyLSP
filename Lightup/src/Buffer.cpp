@@ -3,11 +3,17 @@
 Buffer::Buffer(SIZE_T length)
 {
 	this->p = Buffer::Alloc(length);
+	this->len = length;
 }
 
 Buffer::~Buffer()
 {
 	Buffer::Free(&this->p);
+}
+
+SIZE_T Buffer::Length()
+{
+	return this->len;
 }
 
 char* Buffer::Adress()
