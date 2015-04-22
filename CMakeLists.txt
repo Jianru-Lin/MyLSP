@@ -8,3 +8,6 @@ add_subdirectory (MyLSPInstaller)
 add_subdirectory (Lightup)
 add_subdirectory (gtest-1.7.0)
 add_subdirectory (UnitTest-Lightup)
+
+enable_testing()
+add_test(UnitTest-Lightup ${CMAKE_BINARY_DIR}/Output/UnitTest-Lightup)
