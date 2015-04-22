@@ -2,8 +2,18 @@
 
 Buffer::Buffer(SIZE_T length)
 {
+	this->p = NULL;
+	this->len = 0;
+
 	this->p = Buffer::Alloc(length);
-	this->len = length;
+	if (this->p != NULL) 
+	{
+		this->len = length;
+	}
+	else 
+	{
+		// this->len will be zero
+	}
 }
 
 Buffer::~Buffer()
@@ -23,7 +33,12 @@ char* Buffer::Adress()
 
 char* Buffer::Alloc(SIZE_T length)
 {
-	return (char*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY | HEAP_GENERATE_EXCEPTIONS, length);
+	if (length == 0) 
+	{
+		return NULL;
+	}
+
+	return (char*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, length);
 }
 
 void Buffer::Free(char** p)
