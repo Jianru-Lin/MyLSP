@@ -1,3 +1,7 @@
+add_definitions (
+	-D_UNICODE
+	-DUNICODE )
+
 set (
 	src
 	include/Lightup.h

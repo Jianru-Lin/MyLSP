@@ -1,6 +1,10 @@
 include_directories (
 	../Lightup/include )
 
+add_definitions (
+	-D_UNICODE
+	-DUNICODE )
+
 set (
 	MyLSP_src
 	src/module.def
