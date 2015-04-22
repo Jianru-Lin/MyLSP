@@ -11,7 +11,8 @@ add_definitions (
 
 add_executable (
 	UnitTest-Lightup
-	Buffer.cpp )
+	Buffer.cpp 
+	CriticalSection.cpp )
 
 target_link_libraries (
 	UnitTest-Lightup
