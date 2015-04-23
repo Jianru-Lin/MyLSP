@@ -7,10 +7,10 @@ public:
 	~EasyInstallLSPConfig();
 
 public:
-	LPCTSTR	GetDllPath()					const;
-	GUID	GetProviderGuid()				const;
-	int		GetBaseCatalogIdListLength()	const;
-	bool	GetBaseCatalogIdOf(int i, DWORD* result) const;
+	LPCTSTR	GetDllPath()								const;
+	GUID	GetProviderGuid()							const;
+	int		GetBaseCatalogIdListLength()				const;
+	bool	GetBaseCatalogIdOf(int i, DWORD* result)	const;
 
 private:
 	Buffer	dllPathBuffer;
