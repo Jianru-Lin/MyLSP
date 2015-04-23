@@ -12,4 +12,5 @@
 #include "../src/CriticalSection.h"
 #include "../src/EasyWSCEnumProtocols.h"
 #include "../src/EasyInstallLSP.h"
+#include "../src/EasyInstallLSPConfig.h"
 #include "../src/Guid2Str.h"

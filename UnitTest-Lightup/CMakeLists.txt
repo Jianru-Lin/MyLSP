@@ -15,7 +15,8 @@ add_executable (
 	CriticalSection.cpp
 	EasyWSCEnumProtocols.cpp
 	EasyInstallLSP.cpp
-	Guid2Str.cpp )
+	Guid2Str.cpp 
+	EasyInstallLSPConfig.cpp )
 
 target_link_libraries (
 	UnitTest-Lightup

@@ -14,7 +14,9 @@ set (
 	src/Guid2Str.h
 	src/Guid2Str.cpp
 	src/EasyInstallLSP.h
-	src/EasyInstallLSP.cpp )
+	src/EasyInstallLSP.cpp
+	src/EasyInstallLSPConfig.h
+	src/EasyInstallLSPConfig.cpp )
 
 add_library (
 	Lightup 
