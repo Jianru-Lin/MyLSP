@@ -6,6 +6,7 @@ public:
 	~EasyWSCEnumProtocols();
 
 public:
+	// do not call this function more than once!
 	bool Invoke(LPINT lpiProtocols = NULL);
 
 public:

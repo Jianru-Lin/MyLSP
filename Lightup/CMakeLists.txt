@@ -10,7 +10,11 @@ set (
 	src/CriticalSection.h
 	src/CriticalSection.cpp
 	src/EasyWSCEnumProtocols.h
-	src/EasyWSCEnumProtocols.cpp )
+	src/EasyWSCEnumProtocols.cpp
+	src/Guid2Str.h
+	src/Guid2Str.cpp
+	src/EasyInstallLSP.h
+	src/EasyInstallLSP.cpp )
 
 add_library (
 	Lightup 
