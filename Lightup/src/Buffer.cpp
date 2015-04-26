@@ -85,6 +85,25 @@ Buffer& Buffer::operator=(const char* str)
 	return *this;
 }
 
+Buffer& Buffer::operator=(const wchar_t* str)
+{
+	if (this->p != NULL)
+	{
+		Buffer::Free(&this->p);
+		this->len = 0;
+	}
+
+	if (str != NULL)
+	{
+		size_t str_len = wcslen(str);
+		size_t buff_len = str_len * sizeof(wchar_t) + sizeof(wchar_t);
+		this->p = Buffer::AllocCopy((char*)str, buff_len);
+		this->len = buff_len;
+	}
+
+	return *this;
+}
+
 char* Buffer::Alloc(SIZE_T length)
 {
 	if (length == 0) 

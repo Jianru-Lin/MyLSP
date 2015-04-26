@@ -82,35 +82,36 @@ TEST(BufferTest, AssignOperatorSelf) {
 	b1 = b1 = b1;
 }
 
-TEST(BufferTest, AssignCharStringNULL) {
+TEST(BufferTest, AssignWCharStringNULL) {
 	Buffer b1;
 	EXPECT_EQ(b1.Length(), 0);
 	EXPECT_TRUE(b1.Adress() == NULL);
 
-	b1 = (char*)NULL;
+	b1 = (wchar_t*)NULL;
 	EXPECT_EQ(b1.Length(), 0);
 	EXPECT_TRUE(b1.Adress() == NULL);
 }
 
-TEST(BufferTest, AssignCharStringEmpty) {
+TEST(BufferTest, AssignWCharStringEmpty) {
 	Buffer b1;
 	EXPECT_EQ(b1.Length(), 0);
 	EXPECT_TRUE(b1.Adress() == NULL);
 
-	b1 = "";
-	EXPECT_EQ(b1.Length(), 1);
-	EXPECT_TRUE(b1.Adress() != NULL);
-	EXPECT_EQ(b1.Adress()[0], 0);
-}
-
-TEST(BufferTest, AssignCharString) {
-	Buffer b1;
-	EXPECT_EQ(b1.Length(), 0);
-	EXPECT_TRUE(b1.Adress() == NULL);
-
-	b1 = "a";
+	b1 = L"";
 	EXPECT_EQ(b1.Length(), 2);
 	EXPECT_TRUE(b1.Adress() != NULL);
-	EXPECT_EQ(b1.Adress()[0], 'a');
+	EXPECT_EQ(b1.Adress()[0], 0);
 	EXPECT_EQ(b1.Adress()[1], 0);
+}
+
+TEST(BufferTest, AssignWCharString) {
+	Buffer b1;
+	EXPECT_EQ(b1.Length(), 0);
+	EXPECT_TRUE(b1.Adress() == NULL);
+
+	b1 = L"a";
+	EXPECT_EQ(b1.Length(), 4);
+	EXPECT_TRUE(b1.Adress() != NULL);
+	EXPECT_EQ(b1.Adress()[2], 0);
+	EXPECT_EQ(b1.Adress()[3], 0);
 }

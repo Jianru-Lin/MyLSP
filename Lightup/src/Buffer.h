@@ -22,6 +22,7 @@ private:
 	// string utility
 public:
 	Buffer& operator=(const char* str);
+	Buffer& operator=(const wchar_t* str);
 
 public:
 	static char* Alloc(SIZE_T length);
