@@ -6,6 +6,7 @@ public:
 	Buffer(SIZE_T length);
 	~Buffer();
 
+	// copy constructor & assignment operator
 public:
 	Buffer(const Buffer& src);
 	Buffer& operator=(const Buffer& src);
@@ -18,9 +19,14 @@ private:
 	char* p = NULL;
 	SIZE_T len = 0;
 
+	// string utility
+public:
+	Buffer& operator=(const char* str);
+
 public:
 	static char* Alloc(SIZE_T length);
-	static char* AllocCopy(char* src, SIZE_T length);
+	static char* AllocCopy(const char* src, SIZE_T length);
 	static void Free(char** p);
+
 };
 

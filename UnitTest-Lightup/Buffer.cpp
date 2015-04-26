@@ -81,3 +81,36 @@ TEST(BufferTest, AssignOperatorSelf) {
 	b1 = b1;
 	b1 = b1 = b1;
 }
+
+TEST(BufferTest, AssignCharStringNULL) {
+	Buffer b1;
+	EXPECT_EQ(b1.Length(), 0);
+	EXPECT_TRUE(b1.Adress() == NULL);
+
+	b1 = (char*)NULL;
+	EXPECT_EQ(b1.Length(), 0);
+	EXPECT_TRUE(b1.Adress() == NULL);
+}
+
+TEST(BufferTest, AssignCharStringEmpty) {
+	Buffer b1;
+	EXPECT_EQ(b1.Length(), 0);
+	EXPECT_TRUE(b1.Adress() == NULL);
+
+	b1 = "";
+	EXPECT_EQ(b1.Length(), 1);
+	EXPECT_TRUE(b1.Adress() != NULL);
+	EXPECT_EQ(b1.Adress()[0], 0);
+}
+
+TEST(BufferTest, AssignCharString) {
+	Buffer b1;
+	EXPECT_EQ(b1.Length(), 0);
+	EXPECT_TRUE(b1.Adress() == NULL);
+
+	b1 = "a";
+	EXPECT_EQ(b1.Length(), 2);
+	EXPECT_TRUE(b1.Adress() != NULL);
+	EXPECT_EQ(b1.Adress()[0], 'a');
+	EXPECT_EQ(b1.Adress()[1], 0);
+}

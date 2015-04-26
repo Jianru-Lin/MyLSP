@@ -1,5 +1,6 @@
 #include "../include/Lightup.h"
 #include <assert.h>
+#include <string>
 
 Buffer::Buffer(SIZE_T length)
 {
@@ -66,6 +67,24 @@ char* Buffer::Adress() const
 	return this->p;
 }
 
+Buffer& Buffer::operator=(const char* str)
+{
+	if (this->p != NULL)
+	{
+		Buffer::Free(&this->p);
+		this->len = 0;
+	}
+
+	if (str != NULL)
+	{
+		size_t str_len = strlen(str);
+		this->p = Buffer::AllocCopy(str, str_len + 1);
+		this->len = str_len + 1;
+	}
+
+	return *this;
+}
+
 char* Buffer::Alloc(SIZE_T length)
 {
 	if (length == 0) 
@@ -76,7 +95,7 @@ char* Buffer::Alloc(SIZE_T length)
 	return (char*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, length);
 }
 
-char* Buffer::AllocCopy(char* src, SIZE_T length)
+char* Buffer::AllocCopy(const char* src, SIZE_T length)
 {
 	if (src == NULL || length <= 0)
 	{
