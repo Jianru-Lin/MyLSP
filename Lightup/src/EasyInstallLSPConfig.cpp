@@ -38,6 +38,7 @@ bool EasyInstallLSPConfig::GetBaseCatalogIdOf(int i, DWORD* result) const
 	}
 	else
 	{
-		return this->catalogIdList[i];
+		*result = this->catalogIdList[i];
+		return true;
 	}
 }
