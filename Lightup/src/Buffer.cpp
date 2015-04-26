@@ -36,6 +36,21 @@ Buffer::Buffer(const Buffer& src)
 	}
 }
 
+Buffer& Buffer::operator=(const Buffer& src)
+{
+	const Buffer* p_src = &src;
+	if (p_src == this)
+	{
+		return *this;
+	}
+	else
+	{
+		this->p = Buffer::AllocCopy(src.p, src.len);
+		this->len = src.len;
+		return *this;
+	}
+}
+
 Buffer::~Buffer()
 {
 	Buffer::Free(&this->p);

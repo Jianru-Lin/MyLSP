@@ -63,3 +63,21 @@ TEST(BufferTest, CopyConstruct) {
 		EXPECT_EQ((char)(b2.Adress()[i] + 1), b1.Adress()[i]);
 	}
 }
+
+TEST(BufferTest, AssignOperator) {
+	Buffer b1(128);
+	Buffer b2(256);
+	b2 = b1;
+	EXPECT_EQ(b1.Length(), b2.Length());
+	EXPECT_NE(b1.Adress(), b2.Adress());
+	for (SIZE_T i = 0; i < b2.Length(); ++i)
+	{
+		EXPECT_EQ(b1.Adress()[i], b2.Adress()[i]);
+	}
+}
+
+TEST(BufferTest, AssignOperatorSelf) {
+	Buffer b1(128);
+	b1 = b1;
+	b1 = b1 = b1;
+}

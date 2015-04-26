@@ -3,9 +3,12 @@ class Buffer
 {
 public:
 	Buffer();
-	Buffer(const Buffer& src);
 	Buffer(SIZE_T length);
 	~Buffer();
+
+public:
+	Buffer(const Buffer& src);
+	Buffer& operator=(const Buffer& src);
 
 public:
 	SIZE_T	Length() const;
