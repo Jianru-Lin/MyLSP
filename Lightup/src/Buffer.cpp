@@ -1,6 +1,11 @@
 #include "../include/Lightup.h"
 #include <assert.h>
 #include <string>
+#include <random>
+
+using namespace std;
+
+static default_random_engine random_engine;
 
 Buffer::Buffer(SIZE_T length)
 {
@@ -246,5 +251,11 @@ bool Buffer::Get(SIZE_T pos, char& value) const
 
 void Buffer::Randomize()
 {
-
+	if (this->p != NULL)
+	{
+		for (SIZE_T i = 0; i < this->len; ++i)
+		{
+			this->p[i] = random_engine();
+		}
+	}
 }

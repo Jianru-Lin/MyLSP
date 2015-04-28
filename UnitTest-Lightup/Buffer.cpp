@@ -253,3 +253,16 @@ TEST(BufferTest, SetGet) {
 	EXPECT_TRUE(b1.Get(0, value));
 	EXPECT_EQ(3, value);
 }
+
+TEST(BufferTest, Randomize) {
+	Buffer b1;
+	b1.Randomize();
+	EXPECT_EQ(0, b1.Length());
+	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.IsAllBytesZero());
+
+	Buffer b2(128);
+	EXPECT_TRUE(b2.IsAllBytesZero());
+	b2.Randomize();
+	EXPECT_FALSE(b2.IsAllBytesZero());
+}
