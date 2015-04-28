@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <string>
 #include <random>
+#include <fstream>
 
 using namespace std;
 
@@ -193,14 +194,40 @@ bool Buffer::ReAlloc(SIZE_T length)
 
 bool Buffer::LoadFromFile(const Buffer& fileName)
 {
-	// TODO
-	return false;
+	if (fileName.p == NULL || fileName.p[fileName.len - 1] != '\0')
+	{
+		return false;
+	}
+	ifstream in(fileName.p, ios::in | ios::binary | ios::ate);
+	if (!in.is_open())
+	{
+		return false;
+	}
+	size_t size = (size_t)in.tellg();
+	in.seekg(0, ios::beg);
+	bool result = this->ReAlloc(size);
+	if (result)
+	{
+		in.read(this->p, size);
+	}
+	in.close();
+	return result;
 }
 
 bool Buffer::SaveToFile(const Buffer& fileName)
 {
-	// TODO
-	return false;
+	if (fileName.p == NULL || fileName.p[fileName.len - 1] != '\0')
+	{
+		return false;
+	}
+	ofstream out(fileName.p, ios::out | ios::binary);
+	if (!out.is_open())
+	{
+		return false;
+	}
+	out.write(this->p, this->len);
+	out.close();
+	return true;
 }
 
 bool Buffer::IsAllBytesZero() const

@@ -346,3 +346,23 @@ TEST(BufferTest, SwapSelf) {
 	EXPECT_EQ(128, b2.Length());
 	EXPECT_TRUE(b2.Address() != NULL);
 }
+
+TEST(BufferTest, SaveToFile_LoadFromFile) {
+	Buffer b1(100);
+	Buffer b2;
+
+	Buffer fileName;
+	fileName = "c:\\test.txt";
+	EXPECT_TRUE(b1.SaveToFile(fileName));
+	EXPECT_TRUE(b2.LoadFromFile(fileName));
+	EXPECT_TRUE(b1.Equals(b2));
+	b1.Randomize();
+	EXPECT_TRUE(b1.SaveToFile(fileName));
+	EXPECT_TRUE(b2.LoadFromFile(fileName));
+	EXPECT_TRUE(b1.Equals(b2));
+
+	Buffer errorFileName(5);
+	errorFileName.Randomize();
+	EXPECT_FALSE(b1.SaveToFile(errorFileName));
+	EXPECT_FALSE(b2.LoadFromFile(errorFileName));
+}
