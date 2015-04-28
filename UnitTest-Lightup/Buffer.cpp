@@ -210,3 +210,46 @@ TEST(BufferTest, IsAllBytesZero) {
 	b4.Address()[2] = 0;
 	EXPECT_EQ(true, b4.IsAllBytesZero());
 }
+
+TEST(BufferTest, Get_) {
+	char value = 0;
+
+	Buffer b1;
+	EXPECT_FALSE(b1.Get(0, value));
+	EXPECT_FALSE(b1.Get(1, value));
+
+	Buffer b2(1);
+	EXPECT_TRUE(b2.Get(0, value));
+	EXPECT_FALSE(b2.Get(1, value));
+
+	Buffer b3(2);
+	EXPECT_TRUE(b3.Get(0, value));
+	EXPECT_TRUE(b3.Get(1, value));
+	EXPECT_FALSE(b3.Get(2, value));
+}
+
+TEST(BufferTest, Set_) {
+	char value = 1;
+
+	Buffer b1;
+	EXPECT_FALSE(b1.Set(0, value));
+	EXPECT_FALSE(b1.Set(1, value));
+
+	Buffer b2(1);
+	EXPECT_TRUE(b2.Set(0, value));
+	EXPECT_FALSE(b2.Set(1, value));
+
+	Buffer b3(2);
+	EXPECT_TRUE(b3.Set(0, value));
+	EXPECT_TRUE(b3.Set(1, value));
+	EXPECT_FALSE(b3.Set(2, value));
+}
+
+TEST(BufferTest, SetGet) {
+	char value = 0;
+
+	Buffer b1(1);
+	EXPECT_TRUE(b1.Set(0, 3));
+	EXPECT_TRUE(b1.Get(0, value));
+	EXPECT_EQ(3, value);
+}

@@ -12,10 +12,12 @@ public:
 	Buffer& operator=(const Buffer& src);
 
 public:
-	SIZE_T	Length()					const;
-	char*	Address()					const;
+	SIZE_T	Length()							const;
+	char*	Address()							const;
 	bool	ReAlloc(SIZE_T length);
-	bool	IsAllBytesZero()			const;
+	bool	IsAllBytesZero()					const;
+	bool	Set(SIZE_T pos, char value);
+	bool	Get(SIZE_T pos, char& value)		const;
 
 private:
 	char* p = NULL;

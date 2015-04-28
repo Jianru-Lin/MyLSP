@@ -217,3 +217,29 @@ bool Buffer::IsAllBytesZero() const
 		return true;
 	}
 }
+
+bool Buffer::Set(SIZE_T pos, char value)
+{
+	if (this->p != NULL && pos >= 0 && pos < this->len)
+	{
+		this->p[pos] = value;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Buffer::Get(SIZE_T pos, char& value) const
+{
+	if (this->p != NULL && pos >= 0 && pos < this->len)
+	{
+		value = this->p[pos];
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
