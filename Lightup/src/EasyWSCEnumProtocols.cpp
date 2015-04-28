@@ -28,7 +28,7 @@ bool EasyWSCEnumProtocols::Invoke(LPINT lpiProtocols /*= NULL*/)
 			this->protocolListBuffer = new Buffer(len);
 			
 			// watch out, memory allocation can be failed
-			if (this->protocolListBuffer->Adress() == NULL)
+			if (this->protocolListBuffer->Address() == NULL)
 			{
 				// oops
 				return false;
@@ -36,7 +36,7 @@ bool EasyWSCEnumProtocols::Invoke(LPINT lpiProtocols /*= NULL*/)
 			else
 			{
 				// retry
-				ret = WSCEnumProtocols(lpiProtocols, (LPWSAPROTOCOL_INFOW)this->protocolListBuffer->Adress(), &len, &error);
+				ret = WSCEnumProtocols(lpiProtocols, (LPWSAPROTOCOL_INFOW)this->protocolListBuffer->Address(), &len, &error);
 				
 				if (ret == SOCKET_ERROR)
 				{
@@ -74,7 +74,7 @@ LPWSAPROTOCOL_INFOW EasyWSCEnumProtocols::ProtocolList()
 	}
 	else
 	{
-		return (LPWSAPROTOCOL_INFOW)this->protocolListBuffer->Adress();
+		return (LPWSAPROTOCOL_INFOW)this->protocolListBuffer->Address();
 	}
 }
 

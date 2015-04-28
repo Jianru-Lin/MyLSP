@@ -15,12 +15,12 @@ EasyInstallLSPConfig::EasyInstallLSPConfig(LPCTSTR fileName)
 
 EasyInstallLSPConfig::EasyInstallLSPConfig(const Buffer& content)
 {
-	if (content.Adress() == NULL)
+	if (content.Address() == NULL)
 	{
 		return;
 	}
 	Document doc;
-	doc.Parse(content.Adress());
+	doc.Parse(content.Address());
 }
 
 EasyInstallLSPConfig::~EasyInstallLSPConfig()
@@ -30,7 +30,7 @@ EasyInstallLSPConfig::~EasyInstallLSPConfig()
 
 LPCTSTR EasyInstallLSPConfig::GetDllPath() const
 {
-	return (LPCTSTR)this->dllPathBuffer.Adress();
+	return (LPCTSTR)this->dllPathBuffer.Address();
 }
 
 GUID EasyInstallLSPConfig::GetProviderGuid() const

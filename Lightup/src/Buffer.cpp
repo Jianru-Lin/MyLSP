@@ -62,7 +62,7 @@ SIZE_T Buffer::Length() const
 	return this->len;
 }
 
-char* Buffer::Adress() const
+char* Buffer::Address() const
 {
 	return this->p;
 }

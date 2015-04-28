@@ -13,7 +13,7 @@ public:
 
 public:
 	SIZE_T	Length() const;
-	char*	Adress() const;
+	char*	Address() const;
 
 private:
 	char* p = NULL;
