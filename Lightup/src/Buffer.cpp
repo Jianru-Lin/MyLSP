@@ -259,3 +259,34 @@ void Buffer::Randomize()
 		}
 	}
 }
+
+bool Buffer::Equals(const Buffer& target)
+{
+	if (target.p == NULL && this->p == NULL)
+	{
+		return true;
+	}
+	else if (target.len == this->len)
+	{
+		// optimize
+
+		if (target.p == this->p)
+		{
+			return true;
+		}
+
+		for (SIZE_T i = 0; i < this->len; ++i)
+		{
+			if (this->p[i] != target.p[i])
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

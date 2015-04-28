@@ -254,6 +254,55 @@ TEST(BufferTest, SetGet) {
 	EXPECT_EQ(3, value);
 }
 
+TEST(BufferTest, EqualsEmpty) {
+	Buffer b1, b2;
+	EXPECT_TRUE(b1.Equals(b2));
+	EXPECT_TRUE(b2.Equals(b1));
+}
+
+TEST(BufferTest, EqualsSelf) {
+	Buffer b;
+	EXPECT_TRUE(b.Equals(b));
+}
+
+TEST(BufferTest, EqualsSameValue) {
+	Buffer b1(128), b2(128);
+	EXPECT_TRUE(b1.Equals(b2));
+	EXPECT_TRUE(b2.Equals(b1));
+}
+
+TEST(BufferTest, NotEqualsEmptyAndNotEmpty) {
+	Buffer b1, b2(128);
+	EXPECT_FALSE(b1.Equals(b2));
+	EXPECT_FALSE(b2.Equals(b1));
+}
+
+TEST(BufferTest, NotEqualsDiffLen) {
+	Buffer b1(64), b2(128);
+	EXPECT_FALSE(b1.Equals(b2));
+	EXPECT_FALSE(b2.Equals(b1));
+}
+
+TEST(BufferTest, NotEqualsDiffByte) {
+	Buffer b1(16), b2(16);
+	EXPECT_TRUE(b1.Equals(b2));
+	EXPECT_TRUE(b2.Equals(b1));
+
+	b1.Address()[0] = 1;
+	EXPECT_FALSE(b1.Equals(b2));
+	EXPECT_FALSE(b2.Equals(b1));
+
+	b1.Address()[0] = 0;
+	b1.Address()[15] = 1;
+	EXPECT_FALSE(b1.Equals(b2));
+	EXPECT_FALSE(b2.Equals(b1));
+
+	b1.Address()[15] = 0;
+	b1.Address()[7] = 1;
+	EXPECT_FALSE(b1.Equals(b2));
+	EXPECT_FALSE(b2.Equals(b1));
+}
+
 TEST(BufferTest, Randomize) {
 	Buffer b1;
 	b1.Randomize();

@@ -19,6 +19,7 @@ public:
 	bool	Set(SIZE_T pos, char value);
 	bool	Get(SIZE_T pos, char& value)		const;
 	void	Randomize();
+	bool	Equals(const Buffer& target);
 
 private:
 	char* p = NULL;
