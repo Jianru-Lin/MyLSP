@@ -197,3 +197,23 @@ bool Buffer::SaveToFile(const Buffer& fileName)
 	// TODO
 	return false;
 }
+
+bool Buffer::IsAllBytesZero() const
+{
+	if (this->p == NULL)
+	{
+		return true;
+	}
+	else
+	{
+		for (SIZE_T i = 0; i < this->len; ++i)
+		{
+			if (this->p[i] != 0)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+}

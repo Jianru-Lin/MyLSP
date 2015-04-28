@@ -169,3 +169,44 @@ TEST(BufferTest, AssignWCharString) {
 	EXPECT_EQ(b1.Address()[2], 0);
 	EXPECT_EQ(b1.Address()[3], 0);
 }
+
+TEST(BufferTest, IsAllBytesZero) {
+	Buffer b1;
+	EXPECT_EQ(true, b1.IsAllBytesZero());
+
+	Buffer b2(1);
+	EXPECT_EQ(true, b2.IsAllBytesZero());
+	b2.Address()[0] = 1;
+	EXPECT_EQ(false, b2.IsAllBytesZero());
+
+	Buffer b3(2);
+	EXPECT_EQ(true, b3.IsAllBytesZero());
+	b3.Address()[0] = 0;
+	b3.Address()[1] = 1;
+	EXPECT_EQ(false, b3.IsAllBytesZero());
+	b3.Address()[0] = 1;
+	b3.Address()[1] = 0;
+	EXPECT_EQ(false, b3.IsAllBytesZero());
+	b3.Address()[0] = 0;
+	b3.Address()[1] = 0;
+	EXPECT_EQ(true, b3.IsAllBytesZero());
+
+	Buffer b4(3);
+	EXPECT_EQ(true, b4.IsAllBytesZero());
+	b4.Address()[0] = 1;
+	b4.Address()[1] = 0;
+	b4.Address()[2] = 0;
+	EXPECT_EQ(false, b4.IsAllBytesZero());
+	b4.Address()[0] = 0;
+	b4.Address()[1] = 1;
+	b4.Address()[2] = 0;
+	EXPECT_EQ(false, b4.IsAllBytesZero());
+	b4.Address()[0] = 0;
+	b4.Address()[1] = 0;
+	b4.Address()[2] = 1;
+	EXPECT_EQ(false, b4.IsAllBytesZero());
+	b4.Address()[0] = 0;
+	b4.Address()[1] = 0;
+	b4.Address()[2] = 0;
+	EXPECT_EQ(true, b4.IsAllBytesZero());
+}
