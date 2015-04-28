@@ -31,6 +31,60 @@ TEST(BufferTest, TooBig) {
 	EXPECT_TRUE(b1.Address() == NULL);
 }
 
+TEST(BufferTest, ReAllocZero) {
+	Buffer b1;
+	EXPECT_EQ(0, b1.Length());
+	EXPECT_TRUE(b1.Address() == NULL);
+
+	EXPECT_EQ(true, b1.ReAlloc(0));
+	EXPECT_EQ(0, b1.Length());
+	EXPECT_TRUE(b1.Address() == NULL);
+
+	Buffer b2(128);
+	EXPECT_EQ(128, b2.Length());
+	EXPECT_TRUE(b2.Address() != NULL);
+
+	EXPECT_EQ(true, b2.ReAlloc(0));
+	EXPECT_EQ(0, b2.Length());
+	EXPECT_TRUE(b2.Address() == NULL);
+}
+
+TEST(BufferTest, ReAllocPositive) {
+	Buffer b1;
+	EXPECT_EQ(0, b1.Length());
+	EXPECT_TRUE(b1.Address() == NULL);
+
+	EXPECT_EQ(true, b1.ReAlloc(13));
+	EXPECT_EQ(13, b1.Length());
+	EXPECT_TRUE(b1.Address() != NULL);
+
+	Buffer b2(128);
+	EXPECT_EQ(128, b2.Length());
+	EXPECT_TRUE(b2.Address() != NULL);
+
+	EXPECT_EQ(true, b2.ReAlloc(13));
+	EXPECT_EQ(13, b2.Length());
+	EXPECT_TRUE(b2.Address() != NULL);
+}
+
+TEST(BufferTest, ReAllocTooBig) {
+	Buffer b1;
+	EXPECT_EQ(0, b1.Length());
+	EXPECT_TRUE(b1.Address() == NULL);
+
+	EXPECT_EQ(false, b1.ReAlloc(MAXSIZE_T));
+	EXPECT_EQ(0, b1.Length());
+	EXPECT_TRUE(b1.Address() == NULL);
+
+	Buffer b2(128);
+	EXPECT_EQ(128, b2.Length());
+	EXPECT_TRUE(b2.Address() != NULL);
+
+	EXPECT_EQ(false, b2.ReAlloc(MAXSIZE_T));
+	EXPECT_EQ(0, b2.Length());
+	EXPECT_TRUE(b2.Address() == NULL);
+}
+
 TEST(BufferTest, CopyConstruct) {
 	Buffer b1(128);
 	EXPECT_EQ(128, b1.Length());

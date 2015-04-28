@@ -153,3 +153,35 @@ void Buffer::Free(char** p)
 		*p = NULL;
 	}
 }
+
+bool Buffer::ReAlloc(SIZE_T length)
+{
+	if (this->p != NULL)
+	{
+		Buffer::Free(&this->p);
+		this->len = 0;
+	}
+
+	if (length < 0)
+	{
+		return false;
+	}
+	else if (length == 0)
+	{
+		return true;
+	}
+	else
+	{
+		this->p = Buffer::Alloc(length);
+		if (this->p != NULL)
+		{
+			this->len = length;
+			return true;
+		}
+		else
+		{
+			this->len = 0;
+			return false;
+		}
+	}
+}

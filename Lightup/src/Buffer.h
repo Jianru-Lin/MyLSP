@@ -14,6 +14,7 @@ public:
 public:
 	SIZE_T	Length() const;
 	char*	Address() const;
+	bool	ReAlloc(SIZE_T length);
 
 private:
 	char* p = NULL;
