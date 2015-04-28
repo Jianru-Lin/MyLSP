@@ -1,4 +1,7 @@
 #include "../include/Lightup.h"
+#include "rapidjson/document.h"
+
+using namespace rapidjson;
 
 EasyInstallLSPConfig::EasyInstallLSPConfig()
 {
@@ -8,6 +11,16 @@ EasyInstallLSPConfig::EasyInstallLSPConfig()
 EasyInstallLSPConfig::EasyInstallLSPConfig(LPCTSTR fileName)
 {
 
+}
+
+EasyInstallLSPConfig::EasyInstallLSPConfig(const Buffer& content)
+{
+	if (content.Adress() == NULL)
+	{
+		return;
+	}
+	Document doc;
+	doc.Parse(content.Adress());
 }
 
 EasyInstallLSPConfig::~EasyInstallLSPConfig()

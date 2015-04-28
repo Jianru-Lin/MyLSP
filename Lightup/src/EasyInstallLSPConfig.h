@@ -4,6 +4,7 @@ class EasyInstallLSPConfig
 public:
 	EasyInstallLSPConfig();
 	EasyInstallLSPConfig(LPCTSTR fileName);
+	EasyInstallLSPConfig(const Buffer& content);
 	~EasyInstallLSPConfig();
 
 public:
