@@ -18,6 +18,7 @@ public:
 	bool	IsAllBytesZero()					const;
 	bool	Set(SIZE_T pos, char value);
 	bool	Get(SIZE_T pos, char& value)		const;
+	void	Randomize();
 
 private:
 	char* p = NULL;

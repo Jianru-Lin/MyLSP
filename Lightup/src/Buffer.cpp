@@ -243,3 +243,8 @@ bool Buffer::Get(SIZE_T pos, char& value) const
 		return false;
 	}
 }
+
+void Buffer::Randomize()
+{
+
+}
