@@ -185,3 +185,15 @@ bool Buffer::ReAlloc(SIZE_T length)
 		}
 	}
 }
+
+bool Buffer::LoadFromFile(const Buffer& fileName)
+{
+	// TODO
+	return false;
+}
+
+bool Buffer::SaveToFile(const Buffer& fileName)
+{
+	// TODO
+	return false;
+}

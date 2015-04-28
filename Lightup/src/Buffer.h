@@ -25,6 +25,11 @@ public:
 	Buffer& operator=(const char* str);
 	Buffer& operator=(const wchar_t* str);
 
+	// file system
+public:
+	bool LoadFromFile(const Buffer& fileName);
+	bool SaveToFile(const Buffer& fileName);
+
 public:
 	static char* Alloc(SIZE_T length);
 	static char* AllocCopy(const char* src, SIZE_T length);
