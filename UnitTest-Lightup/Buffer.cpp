@@ -315,3 +315,34 @@ TEST(BufferTest, Randomize) {
 	b2.Randomize();
 	EXPECT_FALSE(b2.IsAllBytesZero());
 }
+
+TEST(BufferTest, SwapEmpty) {
+	Buffer b1, b2;
+	b1.Swap(b2);
+
+	Buffer b3, b4(16);
+	b3.Swap(b4);
+	EXPECT_EQ(16, b3.Length());
+	EXPECT_TRUE(b3.Address() != NULL);
+	EXPECT_EQ(0, b4.Length());
+	EXPECT_TRUE(b4.Address() == NULL);
+}
+
+TEST(BufferTest, SwapNotEmpty) {
+	Buffer b1(16), b2(64);
+	b1.Swap(b2);
+	EXPECT_EQ(64, b1.Length());
+	EXPECT_EQ(16, b2.Length());
+}
+
+TEST(BufferTest, SwapSelf) {
+	Buffer b1;
+	b1.Swap(b1);
+	EXPECT_EQ(0, b1.Length());
+	EXPECT_TRUE(b1.Address() == NULL);
+
+	Buffer b2(128);
+	b2.Swap(b2);
+	EXPECT_EQ(128, b2.Length());
+	EXPECT_TRUE(b2.Address() != NULL);
+}

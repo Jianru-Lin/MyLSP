@@ -290,3 +290,13 @@ bool Buffer::Equals(const Buffer& target)
 		return false;
 	}
 }
+
+void Buffer::Swap(Buffer& target)
+{
+	char* tmp_p = target.p;
+	SIZE_T tmp_len = target.len;
+	target.p = this->p;
+	target.len = this->len;
+	this->p = tmp_p;
+	this->len = tmp_len;
+}
