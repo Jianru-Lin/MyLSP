@@ -439,7 +439,15 @@ bool Buffer::Merge(SSIZE_T pos, const Buffer& buff)
 		}
 	}
 
-	return this->Set(pos, _buff);
+	if (_buff.len > 0) 
+	{
+		if (!this->Set(pos, _buff))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 bool Buffer::Prepend(const Buffer& buff)
@@ -454,19 +462,61 @@ bool Buffer::Append(const Buffer& buff)
 
 bool Buffer::Insert(SIZE_T pos, const Buffer& buff)
 {
-	// TODO
-	return false;
+	if (pos > this->len)
+	{
+		return false;
+		//pos = this->len;
+	}
+
+	Buffer _tail;
+	if (this->len > pos)
+	{
+		if (!this->Get(pos, this->len - pos, _tail))
+		{
+			return false;
+		}
+		if (!this->Resize(pos))
+		{
+			return false;
+		}
+	}
+	this->Append(buff);
+	this->Append(_tail);
+	return true;
 }
 
 bool Buffer::Remove(SIZE_T pos, SIZE_T length)
 {
-	// TODO
-	return false;
+	if (pos >= this->len || length == 0)
+	{
+		return false;
+	}
+
+	Buffer _tail;
+	if (this->len > pos + length)
+	{
+		if (!this->Get(pos + length, this->len - pos - length, _tail))
+		{
+			return false;
+		}
+	}
+	if (!this->Resize(pos))
+	{
+		return false;
+	}
+	this->Append(_tail);
+	return true;
 }
 
 void Buffer::Reverse()
 {
-	// TODO
+	char temp;
+	for (SIZE_T i = 0; i < this->len / 2; ++i)
+	{
+		temp = this->p[i];
+		this->p[i] = this->p[this->len - 1 - i];
+		this->p[this->len - 1 - i] = temp;
+	}
 }
 
 Buffer& Buffer::View(SIZE_T pos, SIZE_T length)
