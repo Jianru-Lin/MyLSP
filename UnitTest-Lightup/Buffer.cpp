@@ -437,6 +437,7 @@ TEST(BufferTest, ResizeSmaller) {
 		EXPECT_TRUE(b.Address()[i] == i);
 	}
 }
+
 TEST(BufferTest, SaveToFile_LoadFromFile) {
 	Buffer b1(100);
 	Buffer b2;
@@ -455,4 +456,54 @@ TEST(BufferTest, SaveToFile_LoadFromFile) {
 	errorFileName.Randomize();
 	EXPECT_FALSE(b1.SaveToFile(errorFileName));
 	EXPECT_FALSE(b2.LoadFromFile(errorFileName));
+}
+
+TEST(BufferTest, Merge) {
+	Buffer b1(100);
+	Buffer b2(50);
+	b1.Merge(10, b2);
+	EXPECT_EQ(100, b1.Length());
+
+	Buffer b3(100);
+	Buffer b4(50);
+	b3.Merge(60, b4);
+	EXPECT_EQ(110, b3.Length());
+
+	Buffer b5(100);
+	Buffer b6(50);
+	b5.Merge(-10, b6);
+	EXPECT_EQ(110, b5.Length());
+
+	Buffer b7;
+	Buffer b8;
+	b7.Merge(0, b8);
+	EXPECT_EQ(0, b7.Length());
+
+	Buffer b9;
+	Buffer b10;
+	b9.Merge(10, b10);
+	EXPECT_EQ(10, b9.Length());
+}
+
+TEST(BufferTest, Prepend_Append) {
+	Buffer b1(100);
+	Buffer b2(50);
+	b1.Prepend(b2);
+	EXPECT_EQ(150, b1.Length());
+	b1.Append(b2);
+	EXPECT_EQ(200, b1.Length());
+
+	Buffer b3;
+	Buffer b4;
+	b3.Prepend(b4);
+	EXPECT_EQ(0, b3.Length());
+	b3.Append(b4);
+	EXPECT_EQ(0, b3.Length());
+
+	Buffer b5;
+	Buffer b6(100);
+	b5.Prepend(b6);
+	EXPECT_EQ(100, b5.Length());
+	b5.Append(b6);
+	EXPECT_EQ(200, b5.Length());
 }

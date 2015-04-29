@@ -424,20 +424,37 @@ bool Buffer::Get(SIZE_T pos, SIZE_T length, Buffer& buff) const
 
 bool Buffer::Merge(SSIZE_T pos, const Buffer& buff)
 {
-	// TODO
-	return false;
+	Buffer _buff = buff;
+	if (pos < 0) 
+	{
+		this->Swap(_buff);
+		pos = -pos;
+	}
+
+	if (this->len < pos + _buff.len)
+	{
+		if (!this->Resize(pos + _buff.len))
+		{
+			return false;
+		}
+	}
+
+	for (SIZE_T i = 0; i < _buff.len; ++i)
+	{
+		this->p[i + pos] = _buff.p[i];
+	}
+
+	return true;
 }
 
 bool Buffer::Prepend(const Buffer& buff)
 {
-	// TODO
-	return false;
+	return this->Merge(-buff.len, buff);
 }
 
 bool Buffer::Append(const Buffer& buff)
 {
-	// TODO
-	return false;
+	return this->Merge(this->len, buff);
 }
 
 bool Buffer::Insert(SIZE_T pos, const Buffer& buff)
