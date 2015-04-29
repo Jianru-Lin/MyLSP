@@ -378,3 +378,28 @@ bool Buffer::Resize(SIZE_T new_len)
 		}
 	}
 }
+
+bool Buffer::Get(SIZE_T pos, SIZE_T length, Buffer& buff) const
+{
+	// notice: length can not be zero, so it's impossible to get an empty buff
+
+	if (!(pos >= 0 && pos < this->len) || !(length > 0 && (length + pos) <= this->len))
+	{
+		return false;
+	}
+	else
+	{
+		if (buff.ReAlloc(length) == false)
+		{
+			return false;
+		}
+		else
+		{
+			for (SIZE_T i = pos; i < (length + pos); ++i)
+			{
+				buff.p[i] = this->p[i];
+			}
+			return true;
+		}
+	}
+}
