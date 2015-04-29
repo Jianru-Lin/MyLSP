@@ -261,8 +261,12 @@ TEST(BufferTest, GetBufferEmpty) {
 }
 
 TEST(BufferTest, GetBufferNotEmpty) {
+	char value = 0;
 	Buffer b1(3), b2;
-	EXPECT_TRUE(b1.Get(0, 1, b2));
+	b1.Set(1, 3);
+	EXPECT_TRUE(b1.Get(1, 1, b2));
+	EXPECT_TRUE(b2.Get(0, value));
+	EXPECT_EQ(3, value);
 }
 
 TEST(BufferTest, SetBuffer) {

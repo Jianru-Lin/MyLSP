@@ -413,9 +413,9 @@ bool Buffer::Get(SIZE_T pos, SIZE_T length, Buffer& buff) const
 		}
 		else
 		{
-			for (SIZE_T i = pos; i < (length + pos); ++i)
+			for (SIZE_T i = 0; i < length; ++i)
 			{
-				buff.p[i] = this->p[i];
+				buff.p[i] = this->p[i + pos];
 			}
 			return true;
 		}
@@ -439,12 +439,7 @@ bool Buffer::Merge(SSIZE_T pos, const Buffer& buff)
 		}
 	}
 
-	for (SIZE_T i = 0; i < _buff.len; ++i)
-	{
-		this->p[i + pos] = _buff.p[i];
-	}
-
-	return true;
+	return this->Set(pos, _buff);
 }
 
 bool Buffer::Prepend(const Buffer& buff)
