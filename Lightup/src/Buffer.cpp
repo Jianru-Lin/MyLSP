@@ -456,3 +456,9 @@ void Buffer::Reverse()
 {
 	// TODO
 }
+
+Buffer& Buffer::View(SIZE_T pos, SIZE_T length)
+{
+	// TODO
+	return *this;
+}

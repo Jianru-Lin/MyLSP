@@ -30,6 +30,7 @@ public:
 	bool	Insert(SIZE_T pos, const Buffer& buff);
 	bool	Remove(SIZE_T pos, SIZE_T length);
 	void	Reverse();
+	Buffer& View(SIZE_T pos, SIZE_T length);
 
 private:
 	char* p = NULL;
