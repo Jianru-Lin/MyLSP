@@ -347,6 +347,70 @@ TEST(BufferTest, SwapSelf) {
 	EXPECT_TRUE(b2.Address() != NULL);
 }
 
+TEST(BufferTest, ResizeZero2Zero) {
+	Buffer b;
+	EXPECT_TRUE(b.Resize(0));
+	EXPECT_EQ(0, b.Length());
+	EXPECT_TRUE(b.Address() == NULL);
+}
+
+TEST(BufferTest, ResizeZero2Positive) {
+	Buffer b;
+	EXPECT_TRUE(b.Resize(1));
+	EXPECT_EQ(1, b.Length());
+	EXPECT_TRUE(b.Address() != NULL);
+}
+
+TEST(BufferTest, ResizeZero2Big) {
+	Buffer b;
+	EXPECT_FALSE(b.Resize(MAXSIZE_T));
+	EXPECT_EQ(0, b.Length());
+	EXPECT_TRUE(b.Address() == NULL);
+}
+
+TEST(BufferTest, ResizePositive2Zero) {
+	Buffer b(1);
+	EXPECT_TRUE(b.Resize(0));
+	EXPECT_EQ(0, b.Length());
+	EXPECT_TRUE(b.Address() == NULL);
+}
+
+TEST(BufferTest, ResizePositive2Positive) {
+	Buffer b(13);
+	EXPECT_TRUE(b.Resize(33));
+	EXPECT_EQ(33, b.Length());
+	EXPECT_TRUE(b.Address() != NULL);
+}
+
+TEST(BufferTest, ResizeBigger) {
+	Buffer b(13);
+	for (SIZE_T i = 0; i < b.Length(); ++i)
+	{
+		b.Address()[i] = (char)i;
+	}
+	EXPECT_TRUE(b.Resize(23));
+	for (SIZE_T i = 0; i < 13; ++i)
+	{
+		EXPECT_TRUE(b.Address()[i] == i);
+	}
+	for (SIZE_T i = 13; i < b.Length(); ++i)
+	{
+		EXPECT_TRUE(b.Address()[i] == 0);
+	}
+}
+
+TEST(BufferTest, ResizeSmaller) {
+	Buffer b(13);
+	for (SIZE_T i = 0; i < b.Length(); ++i)
+	{
+		b.Address()[i] = (char)i;
+	}
+	EXPECT_TRUE(b.Resize(7));
+	for (SIZE_T i = 0; i < b.Length(); ++i)
+	{
+		EXPECT_TRUE(b.Address()[i] == i);
+	}
+}
 TEST(BufferTest, SaveToFile_LoadFromFile) {
 	Buffer b1(100);
 	Buffer b2;

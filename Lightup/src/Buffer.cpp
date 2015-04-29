@@ -327,3 +327,54 @@ void Buffer::Swap(Buffer& target)
 	this->p = tmp_p;
 	this->len = tmp_len;
 }
+
+bool Buffer::Resize(SIZE_T new_len)
+{
+	if (new_len < 0)
+	{
+		return false;
+	}
+	else if (new_len == this->len)
+	{
+		return true;
+	}
+	else if (new_len == 0)
+	{
+		if (this->p != NULL)
+		{
+			Buffer::Free(&this->p);
+			this->len = 0;
+		}
+
+		return true;
+	}
+	else // new_len > 0
+	{
+		char* new_p = Buffer::Alloc(new_len);
+		if (new_p == NULL)
+		{
+			// current state will not change!
+			return false;
+		}
+		else
+		{
+			// copy data as needed
+			if (this->p != NULL)
+			{
+				SIZE_T min_len = this->len < new_len ? this->len : new_len;
+				for (SIZE_T i = 0; i < min_len; ++i)
+				{
+					new_p[i] = this->p[i];
+				}
+
+				// free resources
+				Buffer::Free(&this->p);
+			}
+
+			this->p = new_p;
+			this->len = new_len;
+
+			return true;
+		}
+	}
+}
