@@ -263,6 +263,24 @@ bool Buffer::Set(SIZE_T pos, char value)
 	}
 }
 
+bool Buffer::Set(SIZE_T pos, const Buffer& buff)
+{
+	// notice: buff.len can not be zero, so it's impossible to set an empty buff
+
+	if (!(pos >= 0 && pos < this->len) || !(buff.len > 0 && (pos + buff.len) <= this->len))
+	{
+		return false;
+	}
+	else
+	{
+		for (SIZE_T i = pos, end = pos + buff.len; i < end; ++i)
+		{
+			this->p[i] = buff.p[i];
+		}
+		return true;
+	}
+}
+
 bool Buffer::Get(SIZE_T pos, char& value) const
 {
 	if (this->p != NULL && pos >= 0 && pos < this->len)

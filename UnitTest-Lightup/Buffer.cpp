@@ -265,6 +265,21 @@ TEST(BufferTest, GetBufferNotEmpty) {
 	EXPECT_TRUE(b1.Get(0, 1, b2));
 }
 
+TEST(BufferTest, SetBuffer) {
+	Buffer b1, b2;
+	EXPECT_FALSE(b1.Set(0, b2));
+	
+	Buffer b3, b4(13);
+	EXPECT_FALSE(b3.Set(0, b4));
+
+	Buffer b5(13), b6(13);
+	EXPECT_TRUE(b5.Set(0, b6));
+	EXPECT_FALSE(b5.Set(1, b6));
+
+	Buffer b7(13), b8(14);
+	EXPECT_FALSE(b7.Set(0, b8));
+}
+
 TEST(BufferTest, EqualsEmpty) {
 	Buffer b1, b2;
 	EXPECT_TRUE(b1.Equals(b2));
