@@ -421,3 +421,38 @@ bool Buffer::Get(SIZE_T pos, SIZE_T length, Buffer& buff) const
 		}
 	}
 }
+
+bool Buffer::Merge(SSIZE_T pos, const Buffer& buff)
+{
+	// TODO
+	return false;
+}
+
+bool Buffer::Prepend(const Buffer& buff)
+{
+	// TODO
+	return false;
+}
+
+bool Buffer::Append(const Buffer& buff)
+{
+	// TODO
+	return false;
+}
+
+bool Buffer::Insert(SIZE_T pos, const Buffer& buff)
+{
+	// TODO
+	return false;
+}
+
+bool Buffer::Remove(SIZE_T pos, SIZE_T length)
+{
+	// TODO
+	return false;
+}
+
+void Buffer::Reverse()
+{
+	// TODO
+}

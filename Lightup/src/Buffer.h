@@ -24,6 +24,12 @@ public:
 	void	Randomize();
 	bool	Equals(const Buffer& target)								const;
 	void	Swap(Buffer& target);
+	bool	Merge(SSIZE_T pos, const Buffer& buff);
+	bool	Prepend(const Buffer& buff);
+	bool	Append(const Buffer& buff);
+	bool	Insert(SIZE_T pos, const Buffer& buff);
+	bool	Remove(SIZE_T pos, SIZE_T length);
+	void	Reverse();
 
 private:
 	char* p = NULL;
