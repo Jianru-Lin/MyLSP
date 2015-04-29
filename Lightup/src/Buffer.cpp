@@ -287,7 +287,7 @@ void Buffer::Randomize()
 	}
 }
 
-bool Buffer::Equals(const Buffer& target)
+bool Buffer::Equals(const Buffer& target) const
 {
 	if (target.p == NULL && this->p == NULL)
 	{
