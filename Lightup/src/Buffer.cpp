@@ -3,6 +3,7 @@
 #include <string>
 #include <random>
 #include <fstream>
+#include <unicode/ucnv.h>
 
 using namespace std;
 
@@ -523,4 +524,9 @@ Buffer& Buffer::View(SIZE_T pos, SIZE_T length)
 {
 	// TODO
 	return *this;
+}
+
+bool Buffer::ConvertEncoding(const Buffer& fromEncoding, const Buffer& toEncoding)
+{
+	return false;
 }
