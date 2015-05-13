@@ -40,9 +40,25 @@ private:
 public:
 	Buffer& operator=(const char* str);
 	Buffer& operator=(const wchar_t* str);
-	bool CurrentEncoding(Buffer& encoding);
-	bool ConvertEncoding(const Buffer& toEncoding);
-	bool ConvertEncoding(const Buffer& fromEncoding, const Buffer& toEncoding);
+	bool	CurrentEncoding(Buffer& encoding);
+	bool	ConvertEncoding(const Buffer& toEncoding);
+	bool	ConvertEncoding(const Buffer& fromEncoding, const Buffer& toEncoding);
+	SIZE_T	StrLength();
+	bool	StrIsEmpty();
+	bool	StrIndexOf(const Buffer& str, SIZE_T& pos);
+	bool	StrMerge(SSIZE_T pos, const Buffer& buff);
+	bool	StrPrepend(const Buffer& str);
+	bool	StrAppend(const Buffer& str);
+	bool	StrInsert(SIZE_T pos, const Buffer& buff);
+	bool	StrRemove(SIZE_T pos, SIZE_T length);
+	void	StrReverse();
+	void	StrRandomize(SIZE_T length);
+	bool	StrEquals(const Buffer& target, bool ignoreCase);
+	void	StrClear();
+	bool	StrGet(SIZE_T pos, char& c);
+	bool	StrGet(SIZE_T pos, wchar_t& c);
+	bool	StrSet(SIZE_T pos, char c);
+	bool	StrSet(SIZE_T pos, wchar_t c);
 
 	// file system
 public:
