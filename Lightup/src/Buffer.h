@@ -42,6 +42,7 @@ public:
 	Buffer& operator=(const wchar_t* str);
 	bool	StrGetEncoding(Buffer& encoding);
 	bool	StrSetEncoding(const Buffer& encoding);
+	bool	StrGuessEncoding(const Buffer& encoding);
 	bool	StrConvertToEncoding(const Buffer& toEncoding);
 	bool	StrLength(SIZE_T& length);
 	bool	StrIsEmpty();
