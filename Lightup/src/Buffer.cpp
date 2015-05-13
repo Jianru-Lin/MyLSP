@@ -526,18 +526,13 @@ Buffer& Buffer::View(SIZE_T pos, SIZE_T length)
 	return *this;
 }
 
-bool Buffer::ConvertEncoding(const Buffer& fromEncoding, const Buffer& toEncoding)
-{
-	return false;
-}
-
-bool Buffer::ConvertEncoding(const Buffer& toEncoding)
+bool Buffer::StrConvertToEncoding(const Buffer& toEncoding)
 {
 	// TODO
 	return false;
 }
 
-bool Buffer::CurrentEncoding(Buffer& encoding)
+bool Buffer::StrGetEncoding(Buffer& encoding)
 {
 	// TODO
 	return false;
