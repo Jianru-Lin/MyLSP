@@ -531,6 +531,12 @@ bool Buffer::ConvertEncoding(const Buffer& fromEncoding, const Buffer& toEncodin
 	return false;
 }
 
+bool Buffer::ConvertEncoding(const Buffer& toEncoding)
+{
+	// TODO
+	return false;
+}
+
 bool Buffer::CurrentEncoding(Buffer& encoding)
 {
 	// TODO

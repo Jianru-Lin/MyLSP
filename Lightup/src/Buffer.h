@@ -41,6 +41,7 @@ public:
 	Buffer& operator=(const char* str);
 	Buffer& operator=(const wchar_t* str);
 	bool CurrentEncoding(Buffer& encoding);
+	bool ConvertEncoding(const Buffer& toEncoding);
 	bool ConvertEncoding(const Buffer& fromEncoding, const Buffer& toEncoding);
 
 	// file system
