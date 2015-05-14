@@ -425,16 +425,17 @@ bool Buffer::Get(SIZE_T pos, SIZE_T length, Buffer& buff) const
 
 bool Buffer::Merge(SSIZE_T pos, const Buffer& buff)
 {
+	Buffer _this = *this;
 	Buffer _buff = buff;
 	if (pos < 0) 
 	{
-		this->Swap(_buff);
+		_this.Swap(_buff);
 		pos = -pos;
 	}
 
-	if (this->len < pos + _buff.len)
+	if (_this.len < pos + _buff.len)
 	{
-		if (!this->Resize(pos + _buff.len))
+		if (!_this.Resize(pos + _buff.len))
 		{
 			return false;
 		}
@@ -442,11 +443,13 @@ bool Buffer::Merge(SSIZE_T pos, const Buffer& buff)
 
 	if (_buff.len > 0) 
 	{
-		if (!this->Set(pos, _buff))
+		if (!_this.Set(pos, _buff))
 		{
 			return false;
 		}
 	}
+
+	*this = _this;
 
 	return true;
 }
