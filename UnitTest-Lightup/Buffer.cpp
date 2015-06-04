@@ -4,83 +4,83 @@
 TEST(BufferTest, Positive) {
 	Buffer b1(1);
 	EXPECT_EQ(1, b1.RawLength());
-	EXPECT_TRUE(b1.Address() != NULL);
+	EXPECT_TRUE(b1.RawAddress() != NULL);
 
 	Buffer b2(1024);
 	EXPECT_EQ(1024, b2.RawLength());
-	EXPECT_TRUE(b2.Address() != NULL);
+	EXPECT_TRUE(b2.RawAddress() != NULL);
 }
 
 TEST(BufferTest, Zero) {
 	Buffer b1((BSIZE_T)0);
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 }
 
 TEST(BufferTest, Negtive) {
 	Buffer b1(-1);
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 }
 
 TEST(BufferTest, TooBig) {
 	Buffer b1(MAXBSIZE_T);
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 }
 
 TEST(BufferTest, ReAllocZero) {
 	Buffer b1;
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	EXPECT_EQ(true, b1.ReAlloc(0));
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	Buffer b2(128);
 	EXPECT_EQ(128, b2.RawLength());
-	EXPECT_TRUE(b2.Address() != NULL);
+	EXPECT_TRUE(b2.RawAddress() != NULL);
 
 	EXPECT_EQ(true, b2.ReAlloc(0));
 	EXPECT_EQ(0, b2.RawLength());
-	EXPECT_TRUE(b2.Address() == NULL);
+	EXPECT_TRUE(b2.RawAddress() == NULL);
 }
 
 TEST(BufferTest, ReAllocPositive) {
 	Buffer b1;
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	EXPECT_EQ(true, b1.ReAlloc(13));
 	EXPECT_EQ(13, b1.RawLength());
-	EXPECT_TRUE(b1.Address() != NULL);
+	EXPECT_TRUE(b1.RawAddress() != NULL);
 
 	Buffer b2(128);
 	EXPECT_EQ(128, b2.RawLength());
-	EXPECT_TRUE(b2.Address() != NULL);
+	EXPECT_TRUE(b2.RawAddress() != NULL);
 
 	EXPECT_EQ(true, b2.ReAlloc(13));
 	EXPECT_EQ(13, b2.RawLength());
-	EXPECT_TRUE(b2.Address() != NULL);
+	EXPECT_TRUE(b2.RawAddress() != NULL);
 }
 
 TEST(BufferTest, ReAllocTooBig) {
 	Buffer b1;
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	EXPECT_EQ(false, b1.ReAlloc(MAXBSIZE_T));
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	Buffer b2(128);
 	EXPECT_EQ(128, b2.RawLength());
-	EXPECT_TRUE(b2.Address() != NULL);
+	EXPECT_TRUE(b2.RawAddress() != NULL);
 
 	EXPECT_EQ(false, b2.ReAlloc(MAXBSIZE_T));
 	EXPECT_EQ(0, b2.RawLength());
-	EXPECT_TRUE(b2.Address() == NULL);
+	EXPECT_TRUE(b2.RawAddress() == NULL);
 }
 
 TEST(BufferTest, CopyConstruct) {
@@ -90,29 +90,29 @@ TEST(BufferTest, CopyConstruct) {
 
 	for (BSIZE_T i = 0; i < b1.RawLength(); ++i)
 	{
-		b1.Address()[i] = (char)i;
+		b1.RawAddress()[i] = (char)i;
 	}
 
 	Buffer b2 = b1;
 	EXPECT_TRUE(b2.RawLength() == b1.RawLength());
-	EXPECT_TRUE(b2.Address() != NULL);
-	EXPECT_TRUE(b2.Address() != b1.Address());
+	EXPECT_TRUE(b2.RawAddress() != NULL);
+	EXPECT_TRUE(b2.RawAddress() != b1.RawAddress());
 
 	for (BSIZE_T i = 0; i < b2.RawLength(); ++i)
 	{
-		EXPECT_EQ(b2.Address()[i], b1.Address()[i]);
+		EXPECT_EQ(b2.RawAddress()[i], b1.RawAddress()[i]);
 	}
 
 	// when we change b1, b2 is not changed
 
 	for (BSIZE_T i = 0; i < b1.RawLength(); ++i)
 	{
-		b1.Address()[i] += 1;
+		b1.RawAddress()[i] += 1;
 	}
 
 	for (BSIZE_T i = 0; i < b2.RawLength(); ++i)
 	{
-		EXPECT_EQ((char)(b2.Address()[i] + 1), b1.Address()[i]);
+		EXPECT_EQ((char)(b2.RawAddress()[i] + 1), b1.RawAddress()[i]);
 	}
 }
 
@@ -121,10 +121,10 @@ TEST(BufferTest, AssignOperator) {
 	Buffer b2(256);
 	b2 = b1;
 	EXPECT_EQ(b1.RawLength(), b2.RawLength());
-	EXPECT_NE(b1.Address(), b2.Address());
+	EXPECT_NE(b1.RawAddress(), b2.RawAddress());
 	for (BSIZE_T i = 0; i < b2.RawLength(); ++i)
 	{
-		EXPECT_EQ(b1.Address()[i], b2.Address()[i]);
+		EXPECT_EQ(b1.RawAddress()[i], b2.RawAddress()[i]);
 	}
 }
 
@@ -137,35 +137,35 @@ TEST(BufferTest, AssignOperatorSelf) {
 TEST(BufferTest, AssignWCharStringNULL) {
 	Buffer b1;
 	EXPECT_EQ(b1.RawLength(), 0);
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	b1 = (wchar_t*)NULL;
 	EXPECT_EQ(b1.RawLength(), 0);
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 }
 
 TEST(BufferTest, AssignWCharStringEmpty) {
 	Buffer b1;
 	EXPECT_EQ(b1.RawLength(), 0);
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	b1 = L"";
 	EXPECT_EQ(b1.RawLength(), 2);
-	EXPECT_TRUE(b1.Address() != NULL);
-	EXPECT_EQ(b1.Address()[0], 0);
-	EXPECT_EQ(b1.Address()[1], 0);
+	EXPECT_TRUE(b1.RawAddress() != NULL);
+	EXPECT_EQ(b1.RawAddress()[0], 0);
+	EXPECT_EQ(b1.RawAddress()[1], 0);
 }
 
 TEST(BufferTest, AssignWCharString) {
 	Buffer b1;
 	EXPECT_EQ(b1.RawLength(), 0);
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	b1 = L"a";
 	EXPECT_EQ(b1.RawLength(), 4);
-	EXPECT_TRUE(b1.Address() != NULL);
-	EXPECT_EQ(b1.Address()[2], 0);
-	EXPECT_EQ(b1.Address()[3], 0);
+	EXPECT_TRUE(b1.RawAddress() != NULL);
+	EXPECT_EQ(b1.RawAddress()[2], 0);
+	EXPECT_EQ(b1.RawAddress()[3], 0);
 }
 
 TEST(BufferTest, IsAllBytesZero) {
@@ -174,38 +174,38 @@ TEST(BufferTest, IsAllBytesZero) {
 
 	Buffer b2(1);
 	EXPECT_EQ(true, b2.IsAllBytesZero());
-	b2.Address()[0] = 1;
+	b2.RawAddress()[0] = 1;
 	EXPECT_EQ(false, b2.IsAllBytesZero());
 
 	Buffer b3(2);
 	EXPECT_EQ(true, b3.IsAllBytesZero());
-	b3.Address()[0] = 0;
-	b3.Address()[1] = 1;
+	b3.RawAddress()[0] = 0;
+	b3.RawAddress()[1] = 1;
 	EXPECT_EQ(false, b3.IsAllBytesZero());
-	b3.Address()[0] = 1;
-	b3.Address()[1] = 0;
+	b3.RawAddress()[0] = 1;
+	b3.RawAddress()[1] = 0;
 	EXPECT_EQ(false, b3.IsAllBytesZero());
-	b3.Address()[0] = 0;
-	b3.Address()[1] = 0;
+	b3.RawAddress()[0] = 0;
+	b3.RawAddress()[1] = 0;
 	EXPECT_EQ(true, b3.IsAllBytesZero());
 
 	Buffer b4(3);
 	EXPECT_EQ(true, b4.IsAllBytesZero());
-	b4.Address()[0] = 1;
-	b4.Address()[1] = 0;
-	b4.Address()[2] = 0;
+	b4.RawAddress()[0] = 1;
+	b4.RawAddress()[1] = 0;
+	b4.RawAddress()[2] = 0;
 	EXPECT_EQ(false, b4.IsAllBytesZero());
-	b4.Address()[0] = 0;
-	b4.Address()[1] = 1;
-	b4.Address()[2] = 0;
+	b4.RawAddress()[0] = 0;
+	b4.RawAddress()[1] = 1;
+	b4.RawAddress()[2] = 0;
 	EXPECT_EQ(false, b4.IsAllBytesZero());
-	b4.Address()[0] = 0;
-	b4.Address()[1] = 0;
-	b4.Address()[2] = 1;
+	b4.RawAddress()[0] = 0;
+	b4.RawAddress()[1] = 0;
+	b4.RawAddress()[2] = 1;
 	EXPECT_EQ(false, b4.IsAllBytesZero());
-	b4.Address()[0] = 0;
-	b4.Address()[1] = 0;
-	b4.Address()[2] = 0;
+	b4.RawAddress()[0] = 0;
+	b4.RawAddress()[1] = 0;
+	b4.RawAddress()[2] = 0;
 	EXPECT_EQ(true, b4.IsAllBytesZero());
 }
 
@@ -316,17 +316,17 @@ TEST(BufferTest, NotEqualsDiffByte) {
 	EXPECT_TRUE(b1.Equals(b2));
 	EXPECT_TRUE(b2.Equals(b1));
 
-	b1.Address()[0] = 1;
+	b1.RawAddress()[0] = 1;
 	EXPECT_FALSE(b1.Equals(b2));
 	EXPECT_FALSE(b2.Equals(b1));
 
-	b1.Address()[0] = 0;
-	b1.Address()[15] = 1;
+	b1.RawAddress()[0] = 0;
+	b1.RawAddress()[15] = 1;
 	EXPECT_FALSE(b1.Equals(b2));
 	EXPECT_FALSE(b2.Equals(b1));
 
-	b1.Address()[15] = 0;
-	b1.Address()[7] = 1;
+	b1.RawAddress()[15] = 0;
+	b1.RawAddress()[7] = 1;
 	EXPECT_FALSE(b1.Equals(b2));
 	EXPECT_FALSE(b2.Equals(b1));
 }
@@ -335,7 +335,7 @@ TEST(BufferTest, Randomize) {
 	Buffer b1;
 	b1.Randomize();
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 	EXPECT_TRUE(b1.IsAllBytesZero());
 
 	Buffer b2(128);
@@ -351,9 +351,9 @@ TEST(BufferTest, SwapEmpty) {
 	Buffer b3, b4(16);
 	b3.Swap(b4);
 	EXPECT_EQ(16, b3.RawLength());
-	EXPECT_TRUE(b3.Address() != NULL);
+	EXPECT_TRUE(b3.RawAddress() != NULL);
 	EXPECT_EQ(0, b4.RawLength());
-	EXPECT_TRUE(b4.Address() == NULL);
+	EXPECT_TRUE(b4.RawAddress() == NULL);
 }
 
 TEST(BufferTest, SwapNotEmpty) {
@@ -367,63 +367,63 @@ TEST(BufferTest, SwapSelf) {
 	Buffer b1;
 	b1.Swap(b1);
 	EXPECT_EQ(0, b1.RawLength());
-	EXPECT_TRUE(b1.Address() == NULL);
+	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	Buffer b2(128);
 	b2.Swap(b2);
 	EXPECT_EQ(128, b2.RawLength());
-	EXPECT_TRUE(b2.Address() != NULL);
+	EXPECT_TRUE(b2.RawAddress() != NULL);
 }
 
 TEST(BufferTest, ResizeZero2Zero) {
 	Buffer b;
 	EXPECT_TRUE(b.Resize(0));
 	EXPECT_EQ(0, b.RawLength());
-	EXPECT_TRUE(b.Address() == NULL);
+	EXPECT_TRUE(b.RawAddress() == NULL);
 }
 
 TEST(BufferTest, ResizeZero2Positive) {
 	Buffer b;
 	EXPECT_TRUE(b.Resize(1));
 	EXPECT_EQ(1, b.RawLength());
-	EXPECT_TRUE(b.Address() != NULL);
+	EXPECT_TRUE(b.RawAddress() != NULL);
 }
 
 TEST(BufferTest, ResizeZero2Big) {
 	Buffer b;
 	EXPECT_FALSE(b.Resize(MAXBSIZE_T));
 	EXPECT_EQ(0, b.RawLength());
-	EXPECT_TRUE(b.Address() == NULL);
+	EXPECT_TRUE(b.RawAddress() == NULL);
 }
 
 TEST(BufferTest, ResizePositive2Zero) {
 	Buffer b(1);
 	EXPECT_TRUE(b.Resize(0));
 	EXPECT_EQ(0, b.RawLength());
-	EXPECT_TRUE(b.Address() == NULL);
+	EXPECT_TRUE(b.RawAddress() == NULL);
 }
 
 TEST(BufferTest, ResizePositive2Positive) {
 	Buffer b(13);
 	EXPECT_TRUE(b.Resize(33));
 	EXPECT_EQ(33, b.RawLength());
-	EXPECT_TRUE(b.Address() != NULL);
+	EXPECT_TRUE(b.RawAddress() != NULL);
 }
 
 TEST(BufferTest, ResizeBigger) {
 	Buffer b(13);
 	for (BSIZE_T i = 0; i < b.RawLength(); ++i)
 	{
-		b.Address()[i] = (char)i;
+		b.RawAddress()[i] = (char)i;
 	}
 	EXPECT_TRUE(b.Resize(23));
 	for (BSIZE_T i = 0; i < 13; ++i)
 	{
-		EXPECT_TRUE(b.Address()[i] == i);
+		EXPECT_TRUE(b.RawAddress()[i] == i);
 	}
 	for (BSIZE_T i = 13; i < b.RawLength(); ++i)
 	{
-		EXPECT_TRUE(b.Address()[i] == 0);
+		EXPECT_TRUE(b.RawAddress()[i] == 0);
 	}
 }
 
@@ -431,12 +431,12 @@ TEST(BufferTest, ResizeSmaller) {
 	Buffer b(13);
 	for (BSIZE_T i = 0; i < b.RawLength(); ++i)
 	{
-		b.Address()[i] = (char)i;
+		b.RawAddress()[i] = (char)i;
 	}
 	EXPECT_TRUE(b.Resize(7));
 	for (BSIZE_T i = 0; i < b.RawLength(); ++i)
 	{
-		EXPECT_TRUE(b.Address()[i] == i);
+		EXPECT_TRUE(b.RawAddress()[i] == i);
 	}
 }
 

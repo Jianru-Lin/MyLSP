@@ -108,7 +108,7 @@ BSIZE_T Buffer::RawLength() const
 	return this->len;
 }
 
-char* Buffer::Address() const
+char* Buffer::RawAddress() const
 {
 	return this->p;
 }

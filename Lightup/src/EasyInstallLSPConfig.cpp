@@ -30,7 +30,7 @@ EasyInstallLSPConfig::~EasyInstallLSPConfig()
 
 LPCTSTR EasyInstallLSPConfig::GetDllPath() const
 {
-	return (LPCTSTR)this->dllPathBuffer.Address();
+	return (LPCTSTR)this->dllPathBuffer.RawAddress();
 }
 
 GUID EasyInstallLSPConfig::GetProviderGuid() const
