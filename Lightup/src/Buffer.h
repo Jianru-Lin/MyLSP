@@ -12,53 +12,136 @@ public:
 	Buffer();
 	/// Raw mode constructor, allocate specified length of memory
 	Buffer(BSIZE_T length);
+	/// String mode constructor, str must be null terminated, encoding name will be "char"
+	Buffer(const char* str);
+	/// String mode constructor, str must be null terminated, encoding name will be "wchar_t"
+	Buffer(const wchar_t* str);
+	/// String mode assignment operator, str must be null terminated, encoding name will be "char"
+	Buffer& operator=(const char* str);
+	/// String mode assignment operator, str must be null terminated, encoding name will be "wchar_t"
+	Buffer& operator=(const wchar_t* str);
+	/// common copy constructor
+	Buffer(const Buffer& src);
+	/// common assignment operator
+	Buffer& operator=(const Buffer& src);
 	/// destructor
 	~Buffer();
 
-	// copy constructor & assignment operator
 public:
-	/// copy constructor
-	Buffer(const Buffer& src);
-	/// assignment operator
-	Buffer& operator=(const Buffer& src);
-
-public:
+	/// swap every thing with target buffer
 	void	Swap(Buffer& target);
+	/// free resources and reset state
+	void	Clear();
 
 public:
 	BSIZE_T	RawLength()													const;
-	char*	RawAddress()													const;
-	bool	RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset = 0);
-	bool	RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset = 0);
-	bool	RawCopyTo(const char* dst, BSIZE_T lengthToCopy)					const;
-	bool	RawCopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy)	const;
+	char*	RawAddress()												const;
+	bool	RawCopyFrom(
+				const char* src, 
+				BSIZE_T lengthToCopy, 
+				BSIZE_T dstOffset = 0);
+	bool	RawCopyFrom(
+				const char* src, 
+				BSIZE_T srcOffset, 
+				BSIZE_T lengthToCopy, 
+				BSIZE_T srcSafeLength, 
+				SIZE_T dstOffset = 0);
+	bool	RawCopyTo(
+				const char* dst, 
+				BSIZE_T lengthToCopy)									const;
+	bool	RawCopyTo(
+				const char* dst, 
+				BSIZE_T dstOffset, 
+				BSIZE_T dstSafeLength, 
+				BSIZE_T srcOffset, 
+				BSIZE_T lengthToCopy)									const;
 	bool	RawReAlloc(BSIZE_T length);
 	bool	RawResize(BSIZE_T length);
 	bool	RawIsAllBytesZero()											const;
 	bool	RawSet(BSIZE_T pos, char value);
-	bool	RawGet(BSIZE_T pos, char& value)								const;
+	bool	RawGet(BSIZE_T pos, char& value)							const;
 	bool	RawSet(BSIZE_T pos, const Buffer& buff);
-	bool	RawGet(BSIZE_T pos, BSIZE_T length, Buffer& buff)				const;
-	void	RawRandomize();
+	bool	RawGet(BSIZE_T pos, BSIZE_T length, Buffer& buff)			const;
+	bool	RawRandomize();
 	bool	RawEquals(const Buffer& target)								const;
 	bool	RawMerge(BSIZE_T pos, const Buffer& buff);
 	bool	RawPrepend(const Buffer& buff);
 	bool	RawAppend(const Buffer& buff);
 	bool	RawInsert(BSIZE_T pos, const Buffer& buff);
 	bool	RawRemove(BSIZE_T pos, BSIZE_T length);
-	void	RawReverse();
-	Buffer& RawView(BSIZE_T pos, BSIZE_T length);
+	bool	RawReverse();
+	Buffer& RawView(BSIZE_T pos, BSIZE_T length)						const;
+	bool	RawLoadFromFile(const Buffer& fileName);
+	bool	RawSaveToFile(const Buffer& fileName);
+
+private:
+	bool	_RawCopyFrom(
+				const char* src,
+				BSIZE_T lengthToCopy,
+				BSIZE_T dstOffset = 0);
+	bool	_RawCopyFrom(
+				const char* src,
+				BSIZE_T srcOffset,
+				BSIZE_T lengthToCopy,
+				BSIZE_T srcSafeLength,
+				SIZE_T dstOffset = 0);
+	bool	_RawReAlloc(BSIZE_T length);
+	bool	_RawResize(BSIZE_T length);
+	bool	_RawSet(BSIZE_T pos, char value);
+	bool	_RawSet(BSIZE_T pos, const Buffer& buff);
+	bool	_RawRandomize();
+	bool	_RawMerge(BSIZE_T pos, const Buffer& buff);
+	bool	_RawPrepend(const Buffer& buff);
+	bool	_RawAppend(const Buffer& buff);
+	bool	_RawInsert(BSIZE_T pos, const Buffer& buff);
+	bool	_RawRemove(BSIZE_T pos, BSIZE_T length);
+	bool	_RawReverse();
+	Buffer& _RawView(BSIZE_T pos, BSIZE_T length);
+	// file system
+public:
+	bool _RawLoadFromFile(const Buffer& fileName);
+	bool _RawSaveToFile(const Buffer& fileName);
 
 private:
 	char* rawAddress = NULL;
 	BSIZE_T rawLength = 0;
 
-	// string utility
+	// string mode
 public:
-	Buffer(const char* str);
-	Buffer(const wchar_t* str);
-	Buffer& operator=(const char* str);
-	Buffer& operator=(const wchar_t* str);
+	bool	StrCopyFrom(
+				const char* src,
+				BSIZE_T lengthToCopy,
+				BSIZE_T dstOffset = 0);
+	bool	StrCopyFrom(
+				const char* src,
+				BSIZE_T srcOffset,
+				BSIZE_T lengthToCopy,
+				BSIZE_T srcSafeLength,
+				SIZE_T dstOffset = 0);
+	bool	StrCopyFrom(
+				const wchar_t* src,
+				BSIZE_T lengthToCopy,
+				BSIZE_T dstOffset = 0);
+	bool	StrCopyFrom(
+				const wchar_t* src,
+				BSIZE_T srcOffset,
+				BSIZE_T lengthToCopy,
+				BSIZE_T srcSafeLength,
+				SIZE_T dstOffset = 0);
+	bool	StrCopyTo(const char* dst, BSIZE_T lengthToCopy)			const;
+	bool	StrCopyTo(
+				const char* dst,
+				BSIZE_T dstOffset,
+				BSIZE_T dstSafeLength,
+				BSIZE_T srcOffset,
+				BSIZE_T lengthToCopy)									const;
+	bool	StrCopyTo(const wchar_t* dst, BSIZE_T lengthToCopy)			const;
+	bool	StrCopyTo(
+				const wchar_t* dst,
+				BSIZE_T dstOffset,
+				BSIZE_T dstSafeLength,
+				BSIZE_T srcOffset,
+				BSIZE_T lengthToCopy)									const;
 	bool	StrGetEncoding(Buffer& encoding);
 	bool	StrSetEncoding(const Buffer& encoding);
 	bool	StrGuessEncoding(const Buffer& encoding);
@@ -84,11 +167,6 @@ private:
 	char*	strEncoding = NULL;
 	BSIZE_T	strLength = 0;
 
-	// file system
-public:
-	bool RawLoadFromFile(const Buffer& fileName);
-	bool RawSaveToFile(const Buffer& fileName);
-
 public:
 	static char* Alloc(BSIZE_T length);
 	static char* AllocCopy(const char* src, BSIZE_T length);
@@ -98,17 +176,14 @@ public:
 public:
 	bool	toRawMode();
 	bool	isRawMode();
-	bool	toNTStringMode();
-	bool	isNTStringMode();
-	bool	toLBStringMode();
-	bool	isLBStringMode();
+	bool	toStringMode();
+	bool	isStringMode();
 
 private:
 	enum Mode
 	{
 		Raw,
-		NTString,	// Null Terminated String
-		LBString	// Length Based String
+		String
 	};
 	bool ConvertMode(Mode toMode);
 

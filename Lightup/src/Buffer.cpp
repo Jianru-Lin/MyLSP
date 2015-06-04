@@ -8,23 +8,29 @@
 using namespace std;
 
 static default_random_engine random_engine;
+char char_encoding[] = "char";
+char wchar_t_encoding[] = "wchar_t";
+
+#define ModeMustBe(M) if (this->mode != M) return false;
 
 Buffer::Buffer(BSIZE_T length)
 {
+	assert(this->mode == Raw);
+	assert(this->rawAddress == NULL);
 	CheckState();
-
 	this->rawAddress = Buffer::Alloc(length);
 	// be careful, alloc can be failed
 	if (this->rawAddress != NULL) 
 	{
 		this->rawLength = length;
 	}
-
 	CheckState();
 }
 
 Buffer::Buffer()
 {
+	assert(this->mode == Raw);
+	assert(this->rawAddress == NULL);
 	CheckState();
 }
 
@@ -49,8 +55,16 @@ Buffer::Buffer(const Buffer& src)
 
 Buffer::Buffer(const char* str)
 {
+	assert(this->mode == Raw);
+	assert(this->rawAddress == NULL);
 	CheckState();
-
+	// set mode to String
+	this->mode = String;
+	// set encoding name to char
+	assert(this->strEncoding == NULL);
+	this->strEncoding = char_encoding;
+	// copy char as needed
+	assert(this->strLength == 0);
 	if (str == NULL)
 	{
 		this->rawAddress = NULL;
@@ -58,8 +72,19 @@ Buffer::Buffer(const char* str)
 	}
 	else
 	{
-		this->rawLength = strlen(str) + 1;
-		this->rawAddress = Buffer::AllocCopy(str, this->rawLength);
+		BSIZE_T len = strlen(str);
+		if (len < 1)
+		{
+			this->rawAddress = NULL;
+			this->rawLength = 0;
+		}
+		else
+		{
+			this->rawAddress = Buffer::AllocCopy(str, len + 1);
+			// be careful, AllocCopy can be failed
+			this->rawLength = this->rawAddress != NULL ? len + 1 : 0;
+			this->strLength = this->rawAddress != NULL ? len : 0;
+		}
 	}
 
 	CheckState();
@@ -200,7 +225,7 @@ void Buffer::Free(char** p)
 	}
 }
 
-bool Buffer::RawReAlloc(BSIZE_T length)
+bool Buffer::_RawReAlloc(BSIZE_T length)
 {
 	if (this->rawAddress != NULL)
 	{
@@ -232,7 +257,7 @@ bool Buffer::RawReAlloc(BSIZE_T length)
 	}
 }
 
-bool Buffer::RawLoadFromFile(const Buffer& fileName)
+bool Buffer::_RawLoadFromFile(const Buffer& fileName)
 {
 	if (fileName.rawAddress == NULL || fileName.rawAddress[fileName.rawLength - 1] != '\0')
 	{
@@ -245,7 +270,7 @@ bool Buffer::RawLoadFromFile(const Buffer& fileName)
 	}
 	size_t size = (size_t)in.tellg();
 	in.seekg(0, ios::beg);
-	bool result = this->RawReAlloc(size);
+	bool result = this->_RawReAlloc(size);
 	if (result)
 	{
 		in.read(this->rawAddress, size);
@@ -254,7 +279,7 @@ bool Buffer::RawLoadFromFile(const Buffer& fileName)
 	return result;
 }
 
-bool Buffer::RawSaveToFile(const Buffer& fileName)
+bool Buffer::_RawSaveToFile(const Buffer& fileName)
 {
 	if (fileName.rawAddress == NULL || fileName.rawAddress[fileName.rawLength - 1] != '\0')
 	{
@@ -290,7 +315,7 @@ bool Buffer::RawIsAllBytesZero() const
 	}
 }
 
-bool Buffer::RawSet(BSIZE_T pos, char value)
+bool Buffer::_RawSet(BSIZE_T pos, char value)
 {
 	if (this->rawAddress != NULL && pos >= 0 && pos < this->rawLength)
 	{
@@ -303,7 +328,7 @@ bool Buffer::RawSet(BSIZE_T pos, char value)
 	}
 }
 
-bool Buffer::RawSet(BSIZE_T pos, const Buffer& buff)
+bool Buffer::_RawSet(BSIZE_T pos, const Buffer& buff)
 {
 	// notice: buff.len can not be zero, so it's impossible to set an empty buff
 
@@ -334,7 +359,7 @@ bool Buffer::RawGet(BSIZE_T pos, char& value) const
 	}
 }
 
-void Buffer::RawRandomize()
+bool Buffer::_RawRandomize()
 {
 	if (this->rawAddress != NULL)
 	{
@@ -343,6 +368,7 @@ void Buffer::RawRandomize()
 			this->rawAddress[i] = random_engine();
 		}
 	}
+	return true;
 }
 
 bool Buffer::RawEquals(const Buffer& target) const
@@ -386,7 +412,7 @@ void Buffer::Swap(Buffer& target)
 	this->rawLength = tmp_len;
 }
 
-bool Buffer::RawResize(BSIZE_T new_len)
+bool Buffer::_RawResize(BSIZE_T new_len)
 {
 	if (new_len < 0)
 	{
@@ -447,7 +473,7 @@ bool Buffer::RawGet(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
 	}
 	else
 	{
-		if (buff.RawReAlloc(length) == false)
+		if (buff._RawReAlloc(length) == false)
 		{
 			return false;
 		}
@@ -462,7 +488,7 @@ bool Buffer::RawGet(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
 	}
 }
 
-bool Buffer::RawMerge(BSIZE_T pos, const Buffer& buff)
+bool Buffer::_RawMerge(BSIZE_T pos, const Buffer& buff)
 {
 	Buffer _this = *this;
 	Buffer _buff = buff;
@@ -474,7 +500,7 @@ bool Buffer::RawMerge(BSIZE_T pos, const Buffer& buff)
 
 	if (_this.rawLength < pos + _buff.rawLength)
 	{
-		if (!_this.RawResize(pos + _buff.rawLength))
+		if (!_this._RawResize(pos + _buff.rawLength))
 		{
 			return false;
 		}
@@ -482,7 +508,7 @@ bool Buffer::RawMerge(BSIZE_T pos, const Buffer& buff)
 
 	if (_buff.rawLength > 0) 
 	{
-		if (!_this.RawSet(pos, _buff))
+		if (!_this._RawSet(pos, _buff))
 		{
 			return false;
 		}
@@ -493,17 +519,17 @@ bool Buffer::RawMerge(BSIZE_T pos, const Buffer& buff)
 	return true;
 }
 
-bool Buffer::RawPrepend(const Buffer& buff)
+bool Buffer::_RawPrepend(const Buffer& buff)
 {
-	return this->RawMerge(-buff.rawLength, buff);
+	return this->_RawMerge(-buff.rawLength, buff);
 }
 
-bool Buffer::RawAppend(const Buffer& buff)
+bool Buffer::_RawAppend(const Buffer& buff)
 {
-	return this->RawMerge(this->rawLength, buff);
+	return this->_RawMerge(this->rawLength, buff);
 }
 
-bool Buffer::RawInsert(BSIZE_T pos, const Buffer& buff)
+bool Buffer::_RawInsert(BSIZE_T pos, const Buffer& buff)
 {
 	if (pos > this->rawLength)
 	{
@@ -518,17 +544,17 @@ bool Buffer::RawInsert(BSIZE_T pos, const Buffer& buff)
 		{
 			return false;
 		}
-		if (!this->RawResize(pos))
+		if (!this->_RawResize(pos))
 		{
 			return false;
 		}
 	}
-	this->RawAppend(buff);
-	this->RawAppend(_tail);
+	this->_RawAppend(buff);
+	this->_RawAppend(_tail);
 	return true;
 }
 
-bool Buffer::RawRemove(BSIZE_T pos, BSIZE_T length)
+bool Buffer::_RawRemove(BSIZE_T pos, BSIZE_T length)
 {
 	if (pos >= this->rawLength || length == 0)
 	{
@@ -543,15 +569,15 @@ bool Buffer::RawRemove(BSIZE_T pos, BSIZE_T length)
 			return false;
 		}
 	}
-	if (!this->RawResize(pos))
+	if (!this->_RawResize(pos))
 	{
 		return false;
 	}
-	this->RawAppend(_tail);
+	this->_RawAppend(_tail);
 	return true;
 }
 
-void Buffer::RawReverse()
+bool Buffer::_RawReverse()
 {
 	char temp;
 	for (BSIZE_T i = 0; i < this->rawLength / 2; ++i)
@@ -560,9 +586,10 @@ void Buffer::RawReverse()
 		this->rawAddress[i] = this->rawAddress[this->rawLength - 1 - i];
 		this->rawAddress[this->rawLength - 1 - i] = temp;
 	}
+	return true;
 }
 
-Buffer& Buffer::RawView(BSIZE_T pos, BSIZE_T length)
+Buffer& Buffer::_RawView(BSIZE_T pos, BSIZE_T length)
 {
 	// TODO
 	return *this;
@@ -595,9 +622,9 @@ bool Buffer::toRawMode()
 	return ConvertMode(Raw);
 }
 
-bool Buffer::toNTStringMode()
+bool Buffer::toStringMode()
 {
-	return ConvertMode(NTString);
+	return ConvertMode(String);
 }
 
 bool Buffer::ConvertMode(Mode toMode)
@@ -616,28 +643,19 @@ bool Buffer::ConvertMode(Mode toMode)
 	}
 }
 
-bool Buffer::isNTStringMode()
+bool Buffer::isStringMode()
 {
-	return NTString == this->mode;
-}
-
-bool Buffer::toLBStringMode()
-{
-	return ConvertMode(LBString);
-}
-
-bool Buffer::isLBStringMode()
-{
-	return LBString == this->mode;
+	return String == this->mode;
 }
 
 void Buffer::CheckState() const
 {
 	assert(this->rawAddress != NULL ? this->rawLength > 0 : this->rawLength == 0);
+	assert(this->mode != String ? (this->strEncoding == NULL && this->strLength == 0) : true);
 }
 
 
-bool Buffer::RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+bool Buffer::_RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
 {
 	CheckState();
 
@@ -647,9 +665,9 @@ bool Buffer::RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCop
 	return false;
 }
 
-bool Buffer::RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
+bool Buffer::_RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
 {
-	return RawCopyFrom(src, 0, lengthToCopy, -1, dstOffset);
+	return _RawCopyFrom(src, 0, lengthToCopy, -1, dstOffset);
 }
 
 bool Buffer::RawCopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy) const
@@ -663,4 +681,139 @@ bool Buffer::RawCopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength
 bool Buffer::RawCopyTo(const char* dst, BSIZE_T lengthToCopy) const
 {
 	return RawCopyTo(dst, 0, -1, 0, lengthToCopy);
+}
+
+void Buffer::Clear()
+{
+	CheckState();
+	this->mode = Raw;
+	if (this->rawAddress != NULL)
+	{
+		Buffer::Free(&this->rawAddress);
+		this->rawLength = 0;
+	}
+	if (this->strEncoding != NULL) 
+	{
+		if (this->strEncoding != char_encoding && this->strEncoding != wchar_t_encoding)
+		{
+			Buffer::Free(&this->strEncoding);
+		}
+		this->strEncoding = NULL;
+	}
+	this->strLength = 0;
+	CheckState();
+}
+
+bool Buffer::StrCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
+{
+	return StrCopyFrom(src, 0, lengthToCopy, -1, dstOffset);
+}
+
+bool Buffer::StrCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+{
+	CheckState();
+	// TODO
+	return false;
+}
+
+bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
+{
+	return StrCopyFrom(src, 0, lengthToCopy, -1, dstOffset);
+}
+
+bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+{
+	CheckState();
+	// TODO
+	return false;
+}
+
+bool Buffer::RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
+{
+	ModeMustBe(Raw);
+	return _RawCopyFrom(src, lengthToCopy, dstOffset);
+}
+
+bool Buffer::RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+{
+	ModeMustBe(Raw);
+	return _RawCopyFrom(src, srcOffset, lengthToCopy, srcSafeLength, dstOffset);
+}
+
+bool Buffer::RawReAlloc(BSIZE_T length)
+{
+	ModeMustBe(Raw);
+	return _RawReAlloc(length);
+}
+
+bool Buffer::RawResize(BSIZE_T length)
+{
+	ModeMustBe(Raw);
+	return _RawResize(length);
+}
+
+bool Buffer::RawSet(BSIZE_T pos, char value)
+{
+	ModeMustBe(Raw);
+	return _RawSet(pos, value);
+}
+
+bool Buffer::RawSet(BSIZE_T pos, const Buffer& buff)
+{
+	ModeMustBe(Raw);
+	return _RawSet(pos, buff);
+}
+
+bool Buffer::RawRandomize()
+{
+	ModeMustBe(Raw);
+	return _RawRandomize();
+}
+
+bool Buffer::RawMerge(BSIZE_T pos, const Buffer& buff)
+{
+	ModeMustBe(Raw);
+	return _RawMerge(pos, buff);
+}
+
+bool Buffer::RawPrepend(const Buffer& buff)
+{
+	ModeMustBe(Raw);
+	return _RawPrepend(buff);
+}
+
+bool Buffer::RawAppend(const Buffer& buff)
+{
+	ModeMustBe(Raw);
+	return _RawAppend(buff);
+}
+
+bool Buffer::RawInsert(BSIZE_T pos, const Buffer& buff)
+{
+	ModeMustBe(Raw);
+	return _RawInsert(pos, buff);
+}
+
+bool Buffer::RawRemove(BSIZE_T pos, BSIZE_T length)
+{
+	ModeMustBe(Raw);
+	return _RawRemove(pos, length);
+}
+
+bool Buffer::RawReverse()
+{
+	ModeMustBe(Raw);
+	return _RawReverse();
+}
+
+bool Buffer::RawLoadFromFile(const Buffer& fileName)
+{
+	ModeMustBe(Raw);
+	return _RawLoadFromFile(fileName);
+}
+
+bool Buffer::RawSaveToFile(const Buffer& fileName)
+{
+	ModeMustBe(Raw);
+	return _RawSaveToFile(fileName);
 }
