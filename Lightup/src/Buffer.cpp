@@ -9,7 +9,7 @@ using namespace std;
 
 static default_random_engine random_engine;
 
-Buffer::Buffer(SIZE_T length)
+Buffer::Buffer(BSIZE_T length)
 {
 	CheckState();
 
@@ -47,7 +47,7 @@ Buffer::Buffer(const Buffer& src)
 	CheckState();
 }
 
-Buffer::Buffer(const char* p, SIZE_T length)
+Buffer::Buffer(const char* p, BSIZE_T length)
 {
 	CheckState();
 
@@ -121,7 +121,7 @@ Buffer::~Buffer()
 	Buffer::Free(&this->p);
 }
 
-SIZE_T Buffer::Length() const
+BSIZE_T Buffer::Length() const
 {
 	return this->len;
 }
@@ -168,7 +168,7 @@ Buffer& Buffer::operator=(const wchar_t* str)
 	return *this;
 }
 
-char* Buffer::Alloc(SIZE_T length)
+char* Buffer::Alloc(BSIZE_T length)
 {
 	if (length == 0) 
 	{
@@ -178,7 +178,7 @@ char* Buffer::Alloc(SIZE_T length)
 	return (char*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, length);
 }
 
-char* Buffer::AllocCopy(const char* src, SIZE_T length)
+char* Buffer::AllocCopy(const char* src, BSIZE_T length)
 {
 	if (src == NULL || length <= 0)
 	{
@@ -192,7 +192,7 @@ char* Buffer::AllocCopy(const char* src, SIZE_T length)
 		
 		if (dst != NULL)
 		{
-			for (SIZE_T i = 0; i < length; ++i)
+			for (BSIZE_T i = 0; i < length; ++i)
 			{
 				dst[i] = src[i];
 			}
@@ -218,7 +218,7 @@ void Buffer::Free(char** p)
 	}
 }
 
-bool Buffer::ReAlloc(SIZE_T length)
+bool Buffer::ReAlloc(BSIZE_T length)
 {
 	if (this->p != NULL)
 	{
@@ -296,7 +296,7 @@ bool Buffer::IsAllBytesZero() const
 	}
 	else
 	{
-		for (SIZE_T i = 0; i < this->len; ++i)
+		for (BSIZE_T i = 0; i < this->len; ++i)
 		{
 			if (this->p[i] != 0)
 			{
@@ -308,7 +308,7 @@ bool Buffer::IsAllBytesZero() const
 	}
 }
 
-bool Buffer::Set(SIZE_T pos, char value)
+bool Buffer::Set(BSIZE_T pos, char value)
 {
 	if (this->p != NULL && pos >= 0 && pos < this->len)
 	{
@@ -321,7 +321,7 @@ bool Buffer::Set(SIZE_T pos, char value)
 	}
 }
 
-bool Buffer::Set(SIZE_T pos, const Buffer& buff)
+bool Buffer::Set(BSIZE_T pos, const Buffer& buff)
 {
 	// notice: buff.len can not be zero, so it's impossible to set an empty buff
 
@@ -331,7 +331,7 @@ bool Buffer::Set(SIZE_T pos, const Buffer& buff)
 	}
 	else
 	{
-		for (SIZE_T i = pos, end = pos + buff.len; i < end; ++i)
+		for (BSIZE_T i = pos, end = pos + buff.len; i < end; ++i)
 		{
 			this->p[i] = buff.p[i];
 		}
@@ -339,7 +339,7 @@ bool Buffer::Set(SIZE_T pos, const Buffer& buff)
 	}
 }
 
-bool Buffer::Get(SIZE_T pos, char& value) const
+bool Buffer::Get(BSIZE_T pos, char& value) const
 {
 	if (this->p != NULL && pos >= 0 && pos < this->len)
 	{
@@ -356,7 +356,7 @@ void Buffer::Randomize()
 {
 	if (this->p != NULL)
 	{
-		for (SIZE_T i = 0; i < this->len; ++i)
+		for (BSIZE_T i = 0; i < this->len; ++i)
 		{
 			this->p[i] = random_engine();
 		}
@@ -378,7 +378,7 @@ bool Buffer::Equals(const Buffer& target) const
 			return true;
 		}
 
-		for (SIZE_T i = 0; i < this->len; ++i)
+		for (BSIZE_T i = 0; i < this->len; ++i)
 		{
 			if (this->p[i] != target.p[i])
 			{
@@ -397,14 +397,14 @@ bool Buffer::Equals(const Buffer& target) const
 void Buffer::Swap(Buffer& target)
 {
 	char* tmp_p = target.p;
-	SIZE_T tmp_len = target.len;
+	BSIZE_T tmp_len = target.len;
 	target.p = this->p;
 	target.len = this->len;
 	this->p = tmp_p;
 	this->len = tmp_len;
 }
 
-bool Buffer::Resize(SIZE_T new_len)
+bool Buffer::Resize(BSIZE_T new_len)
 {
 	if (new_len < 0)
 	{
@@ -437,8 +437,8 @@ bool Buffer::Resize(SIZE_T new_len)
 			// copy data as needed
 			if (this->p != NULL)
 			{
-				SIZE_T min_len = this->len < new_len ? this->len : new_len;
-				for (SIZE_T i = 0; i < min_len; ++i)
+				BSIZE_T min_len = this->len < new_len ? this->len : new_len;
+				for (BSIZE_T i = 0; i < min_len; ++i)
 				{
 					new_p[i] = this->p[i];
 				}
@@ -455,7 +455,7 @@ bool Buffer::Resize(SIZE_T new_len)
 	}
 }
 
-bool Buffer::Get(SIZE_T pos, SIZE_T length, Buffer& buff) const
+bool Buffer::Get(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
 {
 	// notice: length can not be zero, so it's impossible to get an empty buff
 
@@ -471,7 +471,7 @@ bool Buffer::Get(SIZE_T pos, SIZE_T length, Buffer& buff) const
 		}
 		else
 		{
-			for (SIZE_T i = 0; i < length; ++i)
+			for (BSIZE_T i = 0; i < length; ++i)
 			{
 				buff.p[i] = this->p[i + pos];
 			}
@@ -480,7 +480,7 @@ bool Buffer::Get(SIZE_T pos, SIZE_T length, Buffer& buff) const
 	}
 }
 
-bool Buffer::Merge(SSIZE_T pos, const Buffer& buff)
+bool Buffer::Merge(BSIZE_T pos, const Buffer& buff)
 {
 	Buffer _this = *this;
 	Buffer _buff = buff;
@@ -521,7 +521,7 @@ bool Buffer::Append(const Buffer& buff)
 	return this->Merge(this->len, buff);
 }
 
-bool Buffer::Insert(SIZE_T pos, const Buffer& buff)
+bool Buffer::Insert(BSIZE_T pos, const Buffer& buff)
 {
 	if (pos > this->len)
 	{
@@ -546,7 +546,7 @@ bool Buffer::Insert(SIZE_T pos, const Buffer& buff)
 	return true;
 }
 
-bool Buffer::Remove(SIZE_T pos, SIZE_T length)
+bool Buffer::Remove(BSIZE_T pos, BSIZE_T length)
 {
 	if (pos >= this->len || length == 0)
 	{
@@ -572,7 +572,7 @@ bool Buffer::Remove(SIZE_T pos, SIZE_T length)
 void Buffer::Reverse()
 {
 	char temp;
-	for (SIZE_T i = 0; i < this->len / 2; ++i)
+	for (BSIZE_T i = 0; i < this->len / 2; ++i)
 	{
 		temp = this->p[i];
 		this->p[i] = this->p[this->len - 1 - i];
@@ -580,7 +580,7 @@ void Buffer::Reverse()
 	}
 }
 
-Buffer& Buffer::View(SIZE_T pos, SIZE_T length)
+Buffer& Buffer::View(BSIZE_T pos, BSIZE_T length)
 {
 	// TODO
 	return *this;

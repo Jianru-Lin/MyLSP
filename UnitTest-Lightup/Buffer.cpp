@@ -12,21 +12,19 @@ TEST(BufferTest, Positive) {
 }
 
 TEST(BufferTest, Zero) {
-	Buffer b1((SIZE_T)0);
+	Buffer b1((BSIZE_T)0);
 	EXPECT_EQ(0, b1.Length());
 	EXPECT_TRUE(b1.Address() == NULL);
 }
 
 TEST(BufferTest, Negtive) {
-	// acutally negtive value is not possible
-	// because SIZE_T is an unsigned type
 	Buffer b1(-1);
 	EXPECT_EQ(0, b1.Length());
 	EXPECT_TRUE(b1.Address() == NULL);
 }
 
 TEST(BufferTest, TooBig) {
-	Buffer b1(MAXSIZE_T);
+	Buffer b1(MAXBSIZE_T);
 	EXPECT_EQ(0, b1.Length());
 	EXPECT_TRUE(b1.Address() == NULL);
 }
@@ -72,7 +70,7 @@ TEST(BufferTest, ReAllocTooBig) {
 	EXPECT_EQ(0, b1.Length());
 	EXPECT_TRUE(b1.Address() == NULL);
 
-	EXPECT_EQ(false, b1.ReAlloc(MAXSIZE_T));
+	EXPECT_EQ(false, b1.ReAlloc(MAXBSIZE_T));
 	EXPECT_EQ(0, b1.Length());
 	EXPECT_TRUE(b1.Address() == NULL);
 
@@ -80,7 +78,7 @@ TEST(BufferTest, ReAllocTooBig) {
 	EXPECT_EQ(128, b2.Length());
 	EXPECT_TRUE(b2.Address() != NULL);
 
-	EXPECT_EQ(false, b2.ReAlloc(MAXSIZE_T));
+	EXPECT_EQ(false, b2.ReAlloc(MAXBSIZE_T));
 	EXPECT_EQ(0, b2.Length());
 	EXPECT_TRUE(b2.Address() == NULL);
 }
@@ -90,7 +88,7 @@ TEST(BufferTest, CopyConstruct) {
 	EXPECT_EQ(128, b1.Length());
 	EXPECT_TRUE(b1.Length() != NULL);
 
-	for (SIZE_T i = 0; i < b1.Length(); ++i)
+	for (BSIZE_T i = 0; i < b1.Length(); ++i)
 	{
 		b1.Address()[i] = (char)i;
 	}
@@ -100,19 +98,19 @@ TEST(BufferTest, CopyConstruct) {
 	EXPECT_TRUE(b2.Address() != NULL);
 	EXPECT_TRUE(b2.Address() != b1.Address());
 
-	for (SIZE_T i = 0; i < b2.Length(); ++i)
+	for (BSIZE_T i = 0; i < b2.Length(); ++i)
 	{
 		EXPECT_EQ(b2.Address()[i], b1.Address()[i]);
 	}
 
 	// when we change b1, b2 is not changed
 
-	for (SIZE_T i = 0; i < b1.Length(); ++i)
+	for (BSIZE_T i = 0; i < b1.Length(); ++i)
 	{
 		b1.Address()[i] += 1;
 	}
 
-	for (SIZE_T i = 0; i < b2.Length(); ++i)
+	for (BSIZE_T i = 0; i < b2.Length(); ++i)
 	{
 		EXPECT_EQ((char)(b2.Address()[i] + 1), b1.Address()[i]);
 	}
@@ -124,7 +122,7 @@ TEST(BufferTest, AssignOperator) {
 	b2 = b1;
 	EXPECT_EQ(b1.Length(), b2.Length());
 	EXPECT_NE(b1.Address(), b2.Address());
-	for (SIZE_T i = 0; i < b2.Length(); ++i)
+	for (BSIZE_T i = 0; i < b2.Length(); ++i)
 	{
 		EXPECT_EQ(b1.Address()[i], b2.Address()[i]);
 	}
@@ -393,7 +391,7 @@ TEST(BufferTest, ResizeZero2Positive) {
 
 TEST(BufferTest, ResizeZero2Big) {
 	Buffer b;
-	EXPECT_FALSE(b.Resize(MAXSIZE_T));
+	EXPECT_FALSE(b.Resize(MAXBSIZE_T));
 	EXPECT_EQ(0, b.Length());
 	EXPECT_TRUE(b.Address() == NULL);
 }
@@ -414,16 +412,16 @@ TEST(BufferTest, ResizePositive2Positive) {
 
 TEST(BufferTest, ResizeBigger) {
 	Buffer b(13);
-	for (SIZE_T i = 0; i < b.Length(); ++i)
+	for (BSIZE_T i = 0; i < b.Length(); ++i)
 	{
 		b.Address()[i] = (char)i;
 	}
 	EXPECT_TRUE(b.Resize(23));
-	for (SIZE_T i = 0; i < 13; ++i)
+	for (BSIZE_T i = 0; i < 13; ++i)
 	{
 		EXPECT_TRUE(b.Address()[i] == i);
 	}
-	for (SIZE_T i = 13; i < b.Length(); ++i)
+	for (BSIZE_T i = 13; i < b.Length(); ++i)
 	{
 		EXPECT_TRUE(b.Address()[i] == 0);
 	}
@@ -431,12 +429,12 @@ TEST(BufferTest, ResizeBigger) {
 
 TEST(BufferTest, ResizeSmaller) {
 	Buffer b(13);
-	for (SIZE_T i = 0; i < b.Length(); ++i)
+	for (BSIZE_T i = 0; i < b.Length(); ++i)
 	{
 		b.Address()[i] = (char)i;
 	}
 	EXPECT_TRUE(b.Resize(7));
-	for (SIZE_T i = 0; i < b.Length(); ++i)
+	for (BSIZE_T i = 0; i < b.Length(); ++i)
 	{
 		EXPECT_TRUE(b.Address()[i] == i);
 	}

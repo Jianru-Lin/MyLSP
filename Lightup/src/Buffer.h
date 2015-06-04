@@ -1,12 +1,18 @@
 #pragma once
 
-/// \brief Make the memory related works easier.
+#define BSIZE_T SSIZE_T
+#define MAXBSIZE_T MAXSSIZE_T
+#define MINBSIZE_T MINSSIZE_T
+
+/// Make the memory related works easier.
 class Buffer
 {
 public:
+	/// Raw mode default constructor, no memory allocated
 	Buffer();
-	Buffer(const char* p, SIZE_T length);
-	Buffer(SIZE_T length);
+	/// LBString mode constructor with default encoding
+	Buffer(const char* p, BSIZE_T length);
+	Buffer(BSIZE_T length);
 	~Buffer();
 
 	// copy constructor & assignment operator
@@ -15,29 +21,29 @@ public:
 	Buffer& operator=(const Buffer& src);
 
 public:
-	SIZE_T	Length()													const;
+	BSIZE_T	Length()													const;
 	char*	Address()													const;
-	bool	ReAlloc(SIZE_T length);
-	bool	Resize(SIZE_T length);
+	bool	ReAlloc(BSIZE_T length);
+	bool	Resize(BSIZE_T length);
 	bool	IsAllBytesZero()											const;
-	bool	Set(SIZE_T pos, char value);
-	bool	Get(SIZE_T pos, char& value)								const;
-	bool	Set(SIZE_T pos, const Buffer& buff);
-	bool	Get(SIZE_T pos, SIZE_T length, Buffer& buff)				const;
+	bool	Set(BSIZE_T pos, char value);
+	bool	Get(BSIZE_T pos, char& value)								const;
+	bool	Set(BSIZE_T pos, const Buffer& buff);
+	bool	Get(BSIZE_T pos, BSIZE_T length, Buffer& buff)				const;
 	void	Randomize();
 	bool	Equals(const Buffer& target)								const;
 	void	Swap(Buffer& target);
-	bool	Merge(SSIZE_T pos, const Buffer& buff);
+	bool	Merge(BSIZE_T pos, const Buffer& buff);
 	bool	Prepend(const Buffer& buff);
 	bool	Append(const Buffer& buff);
-	bool	Insert(SIZE_T pos, const Buffer& buff);
-	bool	Remove(SIZE_T pos, SIZE_T length);
+	bool	Insert(BSIZE_T pos, const Buffer& buff);
+	bool	Remove(BSIZE_T pos, BSIZE_T length);
 	void	Reverse();
-	Buffer& View(SIZE_T pos, SIZE_T length);
+	Buffer& View(BSIZE_T pos, BSIZE_T length);
 
 private:
 	char* p = NULL;
-	SIZE_T len = 0;
+	BSIZE_T len = 0;
 
 	// string utility
 public:
@@ -49,26 +55,26 @@ public:
 	bool	StrSetEncoding(const Buffer& encoding);
 	bool	StrGuessEncoding(const Buffer& encoding);
 	bool	StrConvertToEncoding(const Buffer& toEncoding);
-	bool	StrLength(SIZE_T& length);
+	bool	StrLength(BSIZE_T& length);
 	bool	StrIsEmpty();
-	bool	StrIndexOf(const Buffer& str, SIZE_T& pos);
-	bool	StrMerge(SSIZE_T pos, const Buffer& buff);
+	bool	StrIndexOf(const Buffer& str, BSIZE_T& pos);
+	bool	StrMerge(BSIZE_T pos, const Buffer& buff);
 	bool	StrPrepend(const Buffer& str);
 	bool	StrAppend(const Buffer& str);
-	bool	StrInsert(SIZE_T pos, const Buffer& buff);
-	bool	StrRemove(SIZE_T pos, SIZE_T length);
+	bool	StrInsert(BSIZE_T pos, const Buffer& buff);
+	bool	StrRemove(BSIZE_T pos, BSIZE_T length);
 	bool	StrReverse();
-	bool	StrRandomize(SIZE_T length);
+	bool	StrRandomize(BSIZE_T length);
 	bool	StrEquals(const Buffer& target, bool ignoreCase);
 	bool	StrClear();
-	bool	StrGet(SIZE_T pos, char& c);
-	bool	StrGet(SIZE_T pos, wchar_t& c);
-	bool	StrSet(SIZE_T pos, char c);
-	bool	StrSet(SIZE_T pos, wchar_t c);
+	bool	StrGet(BSIZE_T pos, char& c);
+	bool	StrGet(BSIZE_T pos, wchar_t& c);
+	bool	StrSet(BSIZE_T pos, char c);
+	bool	StrSet(BSIZE_T pos, wchar_t c);
 
 private:
 	char*	strEncoding = NULL;
-	SSIZE_T	strLength = 0;
+	BSIZE_T	strLength = 0;
 
 	// file system
 public:
@@ -76,8 +82,8 @@ public:
 	bool SaveToFile(const Buffer& fileName);
 
 public:
-	static char* Alloc(SIZE_T length);
-	static char* AllocCopy(const char* src, SIZE_T length);
+	static char* Alloc(BSIZE_T length);
+	static char* AllocCopy(const char* src, BSIZE_T length);
 	static void Free(char** p);
 
 	// Mode
