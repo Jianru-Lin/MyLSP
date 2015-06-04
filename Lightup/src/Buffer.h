@@ -23,29 +23,31 @@ public:
 	Buffer& operator=(const Buffer& src);
 
 public:
+	void Swap(Buffer& target);
+
+public:
 	BSIZE_T	RawLength()													const;
 	char*	RawAddress()													const;
 	bool	RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset = 0);
 	bool	RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset = 0);
 	bool	RawCopyTo(const char* dst, BSIZE_T lengthToCopy)					const;
 	bool	RawCopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy)	const;
-	bool	ReAlloc(BSIZE_T length);
-	bool	Resize(BSIZE_T length);
-	bool	IsAllBytesZero()											const;
-	bool	Set(BSIZE_T pos, char value);
-	bool	Get(BSIZE_T pos, char& value)								const;
-	bool	Set(BSIZE_T pos, const Buffer& buff);
-	bool	Get(BSIZE_T pos, BSIZE_T length, Buffer& buff)				const;
-	void	Randomize();
-	bool	Equals(const Buffer& target)								const;
-	void	Swap(Buffer& target);
-	bool	Merge(BSIZE_T pos, const Buffer& buff);
-	bool	Prepend(const Buffer& buff);
-	bool	Append(const Buffer& buff);
-	bool	Insert(BSIZE_T pos, const Buffer& buff);
-	bool	Remove(BSIZE_T pos, BSIZE_T length);
-	void	Reverse();
-	Buffer& View(BSIZE_T pos, BSIZE_T length);
+	bool	RawReAlloc(BSIZE_T length);
+	bool	RawResize(BSIZE_T length);
+	bool	RawIsAllBytesZero()											const;
+	bool	RawSet(BSIZE_T pos, char value);
+	bool	RawGet(BSIZE_T pos, char& value)								const;
+	bool	RawSet(BSIZE_T pos, const Buffer& buff);
+	bool	RawGet(BSIZE_T pos, BSIZE_T length, Buffer& buff)				const;
+	void	RawRandomize();
+	bool	RawEquals(const Buffer& target)								const;
+	bool	RawMerge(BSIZE_T pos, const Buffer& buff);
+	bool	RawPrepend(const Buffer& buff);
+	bool	RawAppend(const Buffer& buff);
+	bool	RawInsert(BSIZE_T pos, const Buffer& buff);
+	bool	RawRemove(BSIZE_T pos, BSIZE_T length);
+	void	RawReverse();
+	Buffer& RawView(BSIZE_T pos, BSIZE_T length);
 
 private:
 	char* p = NULL;

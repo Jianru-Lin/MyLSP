@@ -200,7 +200,7 @@ void Buffer::Free(char** p)
 	}
 }
 
-bool Buffer::ReAlloc(BSIZE_T length)
+bool Buffer::RawReAlloc(BSIZE_T length)
 {
 	if (this->p != NULL)
 	{
@@ -245,7 +245,7 @@ bool Buffer::LoadFromFile(const Buffer& fileName)
 	}
 	size_t size = (size_t)in.tellg();
 	in.seekg(0, ios::beg);
-	bool result = this->ReAlloc(size);
+	bool result = this->RawReAlloc(size);
 	if (result)
 	{
 		in.read(this->p, size);
@@ -270,7 +270,7 @@ bool Buffer::SaveToFile(const Buffer& fileName)
 	return true;
 }
 
-bool Buffer::IsAllBytesZero() const
+bool Buffer::RawIsAllBytesZero() const
 {
 	if (this->p == NULL)
 	{
@@ -290,7 +290,7 @@ bool Buffer::IsAllBytesZero() const
 	}
 }
 
-bool Buffer::Set(BSIZE_T pos, char value)
+bool Buffer::RawSet(BSIZE_T pos, char value)
 {
 	if (this->p != NULL && pos >= 0 && pos < this->len)
 	{
@@ -303,7 +303,7 @@ bool Buffer::Set(BSIZE_T pos, char value)
 	}
 }
 
-bool Buffer::Set(BSIZE_T pos, const Buffer& buff)
+bool Buffer::RawSet(BSIZE_T pos, const Buffer& buff)
 {
 	// notice: buff.len can not be zero, so it's impossible to set an empty buff
 
@@ -321,7 +321,7 @@ bool Buffer::Set(BSIZE_T pos, const Buffer& buff)
 	}
 }
 
-bool Buffer::Get(BSIZE_T pos, char& value) const
+bool Buffer::RawGet(BSIZE_T pos, char& value) const
 {
 	if (this->p != NULL && pos >= 0 && pos < this->len)
 	{
@@ -334,7 +334,7 @@ bool Buffer::Get(BSIZE_T pos, char& value) const
 	}
 }
 
-void Buffer::Randomize()
+void Buffer::RawRandomize()
 {
 	if (this->p != NULL)
 	{
@@ -345,7 +345,7 @@ void Buffer::Randomize()
 	}
 }
 
-bool Buffer::Equals(const Buffer& target) const
+bool Buffer::RawEquals(const Buffer& target) const
 {
 	if (target.p == NULL && this->p == NULL)
 	{
@@ -386,7 +386,7 @@ void Buffer::Swap(Buffer& target)
 	this->len = tmp_len;
 }
 
-bool Buffer::Resize(BSIZE_T new_len)
+bool Buffer::RawResize(BSIZE_T new_len)
 {
 	if (new_len < 0)
 	{
@@ -437,7 +437,7 @@ bool Buffer::Resize(BSIZE_T new_len)
 	}
 }
 
-bool Buffer::Get(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
+bool Buffer::RawGet(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
 {
 	// notice: length can not be zero, so it's impossible to get an empty buff
 
@@ -447,7 +447,7 @@ bool Buffer::Get(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
 	}
 	else
 	{
-		if (buff.ReAlloc(length) == false)
+		if (buff.RawReAlloc(length) == false)
 		{
 			return false;
 		}
@@ -462,7 +462,7 @@ bool Buffer::Get(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
 	}
 }
 
-bool Buffer::Merge(BSIZE_T pos, const Buffer& buff)
+bool Buffer::RawMerge(BSIZE_T pos, const Buffer& buff)
 {
 	Buffer _this = *this;
 	Buffer _buff = buff;
@@ -474,7 +474,7 @@ bool Buffer::Merge(BSIZE_T pos, const Buffer& buff)
 
 	if (_this.len < pos + _buff.len)
 	{
-		if (!_this.Resize(pos + _buff.len))
+		if (!_this.RawResize(pos + _buff.len))
 		{
 			return false;
 		}
@@ -482,7 +482,7 @@ bool Buffer::Merge(BSIZE_T pos, const Buffer& buff)
 
 	if (_buff.len > 0) 
 	{
-		if (!_this.Set(pos, _buff))
+		if (!_this.RawSet(pos, _buff))
 		{
 			return false;
 		}
@@ -493,17 +493,17 @@ bool Buffer::Merge(BSIZE_T pos, const Buffer& buff)
 	return true;
 }
 
-bool Buffer::Prepend(const Buffer& buff)
+bool Buffer::RawPrepend(const Buffer& buff)
 {
-	return this->Merge(-buff.len, buff);
+	return this->RawMerge(-buff.len, buff);
 }
 
-bool Buffer::Append(const Buffer& buff)
+bool Buffer::RawAppend(const Buffer& buff)
 {
-	return this->Merge(this->len, buff);
+	return this->RawMerge(this->len, buff);
 }
 
-bool Buffer::Insert(BSIZE_T pos, const Buffer& buff)
+bool Buffer::RawInsert(BSIZE_T pos, const Buffer& buff)
 {
 	if (pos > this->len)
 	{
@@ -514,21 +514,21 @@ bool Buffer::Insert(BSIZE_T pos, const Buffer& buff)
 	Buffer _tail;
 	if (this->len > pos)
 	{
-		if (!this->Get(pos, this->len - pos, _tail))
+		if (!this->RawGet(pos, this->len - pos, _tail))
 		{
 			return false;
 		}
-		if (!this->Resize(pos))
+		if (!this->RawResize(pos))
 		{
 			return false;
 		}
 	}
-	this->Append(buff);
-	this->Append(_tail);
+	this->RawAppend(buff);
+	this->RawAppend(_tail);
 	return true;
 }
 
-bool Buffer::Remove(BSIZE_T pos, BSIZE_T length)
+bool Buffer::RawRemove(BSIZE_T pos, BSIZE_T length)
 {
 	if (pos >= this->len || length == 0)
 	{
@@ -538,20 +538,20 @@ bool Buffer::Remove(BSIZE_T pos, BSIZE_T length)
 	Buffer _tail;
 	if (this->len > pos + length)
 	{
-		if (!this->Get(pos + length, this->len - pos - length, _tail))
+		if (!this->RawGet(pos + length, this->len - pos - length, _tail))
 		{
 			return false;
 		}
 	}
-	if (!this->Resize(pos))
+	if (!this->RawResize(pos))
 	{
 		return false;
 	}
-	this->Append(_tail);
+	this->RawAppend(_tail);
 	return true;
 }
 
-void Buffer::Reverse()
+void Buffer::RawReverse()
 {
 	char temp;
 	for (BSIZE_T i = 0; i < this->len / 2; ++i)
@@ -562,7 +562,7 @@ void Buffer::Reverse()
 	}
 }
 
-Buffer& Buffer::View(BSIZE_T pos, BSIZE_T length)
+Buffer& Buffer::RawView(BSIZE_T pos, BSIZE_T length)
 {
 	// TODO
 	return *this;
