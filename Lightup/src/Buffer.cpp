@@ -12,6 +12,7 @@ char char_encoding[] = "char";
 char wchar_t_encoding[] = "wchar_t";
 
 #define ModeMustBe(M) if (this->mode != M) return false;
+#define VerifyState_RETURN(B) VerifyState(); return B;
 
 Buffer::Buffer(BSIZE_T length)
 {
@@ -125,18 +126,7 @@ Buffer& Buffer::operator=(const Buffer& src)
 
 Buffer::~Buffer()
 {
-	if (this->mode == Raw)
-	{
-		RawClear();
-	}
-	else if (this->mode == String)
-	{
-		StrClear();
-	}
-	else
-	{
-		assert(false);
-	}
+	Clear();
 }
 
 BSIZE_T Buffer::RawLength() const
@@ -413,7 +403,7 @@ bool Buffer::RawEquals(const Buffer& target) const
 	}
 }
 
-void Buffer::Swap(Buffer& target)
+void Buffer::SwapWith(Buffer& target)
 {
 	assert(false);
 // 	char* tmp_p = target.rawAddress;
@@ -506,7 +496,7 @@ bool Buffer::_RawMerge(BSIZE_T pos, const Buffer& buff)
 	Buffer _buff = buff;
 	if (pos < 0) 
 	{
-		_this.Swap(_buff);
+		_this.SwapWith(_buff);
 		pos = -pos;
 	}
 
@@ -667,11 +657,66 @@ void Buffer::VerifyState() const
 }
 
 
-bool Buffer::_RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+bool Buffer::_RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, BSIZE_T dstOffset /*= 0*/)
 {
 	VerifyState();
-	VerifyState();
-	return false;
+	if (src == NULL)
+	{
+		// src is null, nothing to do
+		// my state will not change
+		// ignore rest arguments
+		VerifyState_RETURN(true);
+	}
+
+	if (lengthToCopy < 0)
+	{
+		// lengthToCopy can not be negtive when src is not null
+		VerifyState_RETURN(false);
+	}
+	
+	if (lengthToCopy == 0)
+	{
+		// nothing to copy.
+		// my state will not change
+		// ignore rest arguments
+		VerifyState_RETURN(true);
+	}
+
+	// we are going to check src range now,
+	// but srcSafeLength can be set to -1 to skip this behaviour
+	if (srcSafeLength != -1)
+	{
+		if (srcSafeLength <= 0)
+		{
+			// lengthToCopy > 0 && srcSafeLength <= 0
+			// invalid arguments
+			VerifyState_RETURN(false);
+		}
+
+		// lengthToCopy > 0 && srcSafeLength > 0
+		// we will check src range now
+		bool invalidSrcRange = srcOffset < 0 || srcOffset >= srcSafeLength || (srcOffset + lengthToCopy > srcSafeLength);
+		if (invalidSrcRange)
+		{
+			VerifyState_RETURN(false);
+		}
+	}
+
+	// check srcOffset
+	bool invalidDstOffset = dstOffset < 0 || dstOffset >= this->rawLength || (dstOffset + lengthToCopy > this->rawLength);
+	if (invalidDstOffset)
+	{
+		VerifyState_RETURN(false);
+	}
+
+	// ok, it's time to copy
+	for (BSIZE_T iSrcOffset = srcOffset, iDstOffset = dstOffset, count = lengthToCopy; count > 0; ++iSrcOffset, ++iDstOffset, --count)
+	{
+		this->rawAddress[iDstOffset] = src[iSrcOffset];
+	}
+
+	// done
+	VerifyState_RETURN(true);
 }
 
 bool Buffer::_RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
@@ -695,21 +740,18 @@ bool Buffer::RawCopyTo(const char* dst, BSIZE_T lengthToCopy) const
 void Buffer::Clear()
 {
 	VerifyState();
-	this->mode = Raw;
-	if (this->rawAddress != NULL)
+	if (this->mode == Raw)
 	{
-		Buffer::Free(&this->rawAddress);
-		this->rawLength = 0;
+		RawClear();
 	}
-	if (this->strEncoding != NULL) 
+	else if (this->mode == String)
 	{
-		if (this->strEncoding != char_encoding && this->strEncoding != wchar_t_encoding)
-		{
-			Buffer::Free(&this->strEncoding);
-		}
-		this->strEncoding = NULL;
+		StrClear();
 	}
-	this->strLength = 0;
+	else
+	{
+		assert(false);
+	}
 	VerifyState();
 }
 
@@ -718,7 +760,7 @@ bool Buffer::StrCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffse
 	return StrCopyFrom(src, 0, lengthToCopy, -1, dstOffset);
 }
 
-bool Buffer::StrCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+bool Buffer::StrCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, BSIZE_T dstOffset /*= 0*/)
 {
 	VerifyState();
 	// TODO
@@ -730,7 +772,7 @@ bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T lengthToCopy, BSIZE_T dstOf
 	return StrCopyFrom(src, 0, lengthToCopy, -1, dstOffset);
 }
 
-bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, BSIZE_T dstOffset /*= 0*/)
 {
 	VerifyState();
 	// TODO
@@ -743,7 +785,7 @@ bool Buffer::RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffse
 	return _RawCopyFrom(src, lengthToCopy, dstOffset);
 }
 
-bool Buffer::RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+bool Buffer::RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, BSIZE_T dstOffset /*= 0*/)
 {
 	ModeMustBe(Raw);
 	return _RawCopyFrom(src, srcOffset, lengthToCopy, srcSafeLength, dstOffset);

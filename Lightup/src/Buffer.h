@@ -56,7 +56,7 @@ private:
 
 public:
 	/// swap every thing with target
-	void	Swap(Buffer& target);
+	void	SwapWith(Buffer& target);
 	/// free all the resources used in raw mode, 
 	///		won't touch any resources not belongs to raw mode. 
 	///		after invoking (rawAddress == null && rawLength == 0).
@@ -82,7 +82,7 @@ public:
 				BSIZE_T srcOffset, 
 				BSIZE_T lengthToCopy, 
 				BSIZE_T srcSafeLength, 
-				SIZE_T dstOffset = 0);
+				BSIZE_T dstOffset = 0);
 	bool	RawCopyTo(
 				const char* dst, 
 				BSIZE_T lengthToCopy)									const;
@@ -121,7 +121,7 @@ private:
 				BSIZE_T srcOffset,
 				BSIZE_T lengthToCopy,
 				BSIZE_T srcSafeLength,
-				SIZE_T dstOffset = 0);
+				BSIZE_T dstOffset = 0);
 	bool	_RawReAlloc(BSIZE_T length);
 	bool	_RawResize(BSIZE_T length);
 	bool	_RawSet(BSIZE_T pos, char value);
@@ -149,7 +149,7 @@ public:
 				BSIZE_T srcOffset,
 				BSIZE_T lengthToCopy,
 				BSIZE_T srcSafeLength,
-				SIZE_T dstOffset = 0);
+				BSIZE_T dstOffset = 0);
 	bool	StrCopyFrom(
 				const wchar_t* src,
 				BSIZE_T lengthToCopy,
@@ -159,7 +159,7 @@ public:
 				BSIZE_T srcOffset,
 				BSIZE_T lengthToCopy,
 				BSIZE_T srcSafeLength,
-				SIZE_T dstOffset = 0);
+				BSIZE_T dstOffset = 0);
 	bool	StrCopyTo(const char* dst, BSIZE_T lengthToCopy)			const;
 	bool	StrCopyTo(
 				const char* dst,

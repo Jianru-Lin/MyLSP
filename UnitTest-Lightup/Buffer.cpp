@@ -346,10 +346,10 @@ TEST(BufferTest, Randomize) {
 
 TEST(BufferTest, SwapEmpty) {
 	Buffer b1, b2;
-	b1.Swap(b2);
+	b1.SwapWith(b2);
 
 	Buffer b3, b4(16);
-	b3.Swap(b4);
+	b3.SwapWith(b4);
 	EXPECT_EQ(16, b3.RawLength());
 	EXPECT_TRUE(b3.RawAddress() != NULL);
 	EXPECT_EQ(0, b4.RawLength());
@@ -358,19 +358,19 @@ TEST(BufferTest, SwapEmpty) {
 
 TEST(BufferTest, SwapNotEmpty) {
 	Buffer b1(16), b2(64);
-	b1.Swap(b2);
+	b1.SwapWith(b2);
 	EXPECT_EQ(64, b1.RawLength());
 	EXPECT_EQ(16, b2.RawLength());
 }
 
 TEST(BufferTest, SwapSelf) {
 	Buffer b1;
-	b1.Swap(b1);
+	b1.SwapWith(b1);
 	EXPECT_EQ(0, b1.RawLength());
 	EXPECT_TRUE(b1.RawAddress() == NULL);
 
 	Buffer b2(128);
-	b2.Swap(b2);
+	b2.SwapWith(b2);
 	EXPECT_EQ(128, b2.RawLength());
 	EXPECT_TRUE(b2.RawAddress() != NULL);
 }
