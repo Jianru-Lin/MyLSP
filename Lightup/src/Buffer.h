@@ -1,5 +1,6 @@
 #pragma once
 
+/// \brief Make the memory related works easier.
 class Buffer
 {
 public:
