@@ -47,24 +47,6 @@ Buffer::Buffer(const Buffer& src)
 	CheckState();
 }
 
-Buffer::Buffer(const char* p, BSIZE_T length)
-{
-	CheckState();
-
-	if (p == NULL || (p != NULL && length == 0))
-	{
-		this->p = NULL;
-		this->len = 0;
-	}
-	else
-	{
-		this->p = Buffer::AllocCopy(p, length);
-		this->len = length;
-	}
-
-	CheckState();
-}
-
 Buffer::Buffer(const char* str)
 {
 	CheckState();
@@ -649,7 +631,36 @@ bool Buffer::isLBStringMode()
 	return LBString == this->mode;
 }
 
-void Buffer::CheckState()
+void Buffer::CheckState() const
 {
 	assert(this->p != NULL ? this->len > 0 : this->len == 0);
+}
+
+
+bool Buffer::CopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
+{
+	CheckState();
+
+	// TODO
+
+	CheckState();
+	return false;
+}
+
+bool Buffer::CopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
+{
+	return CopyFrom(src, 0, lengthToCopy, -1, dstOffset);
+}
+
+bool Buffer::CopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy) const
+{
+	CheckState();
+	// TODO
+	CheckState();
+	return false;
+}
+
+bool Buffer::CopyTo(const char* dst, BSIZE_T lengthToCopy) const
+{
+	return CopyTo(dst, 0, -1, 0, lengthToCopy);
 }

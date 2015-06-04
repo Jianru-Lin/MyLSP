@@ -10,19 +10,25 @@ class Buffer
 public:
 	/// Raw mode default constructor, no memory allocated
 	Buffer();
-	/// LBString mode constructor with default encoding
-	Buffer(const char* p, BSIZE_T length);
+	// Raw mode constructor, allocate specified length of memory
 	Buffer(BSIZE_T length);
+	// destructor
 	~Buffer();
 
 	// copy constructor & assignment operator
 public:
+	// copy constructor
 	Buffer(const Buffer& src);
+	// assignment operator
 	Buffer& operator=(const Buffer& src);
 
 public:
 	BSIZE_T	Length()													const;
 	char*	Address()													const;
+	bool	CopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset = 0);
+	bool	CopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset = 0);
+	bool	CopyTo(const char* dst, BSIZE_T lengthToCopy)					const;
+	bool	CopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy)	const;
 	bool	ReAlloc(BSIZE_T length);
 	bool	Resize(BSIZE_T length);
 	bool	IsAllBytesZero()											const;
@@ -108,6 +114,6 @@ private:
 	Mode mode = Raw;
 
 private:
-	void CheckState();
+	void CheckState()	const;
 };
 
