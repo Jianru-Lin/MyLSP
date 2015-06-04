@@ -652,7 +652,7 @@ bool Buffer::RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffse
 	return RawCopyFrom(src, 0, lengthToCopy, -1, dstOffset);
 }
 
-bool Buffer::CopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy) const
+bool Buffer::RawCopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy) const
 {
 	CheckState();
 	// TODO
@@ -660,7 +660,7 @@ bool Buffer::CopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, B
 	return false;
 }
 
-bool Buffer::CopyTo(const char* dst, BSIZE_T lengthToCopy) const
+bool Buffer::RawCopyTo(const char* dst, BSIZE_T lengthToCopy) const
 {
-	return CopyTo(dst, 0, -1, 0, lengthToCopy);
+	return RawCopyTo(dst, 0, -1, 0, lengthToCopy);
 }
