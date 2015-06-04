@@ -10,20 +10,20 @@ class Buffer
 public:
 	/// Raw mode default constructor, no memory allocated
 	Buffer();
-	// Raw mode constructor, allocate specified length of memory
+	/// Raw mode constructor, allocate specified length of memory
 	Buffer(BSIZE_T length);
-	// destructor
+	/// destructor
 	~Buffer();
 
 	// copy constructor & assignment operator
 public:
-	// copy constructor
+	/// copy constructor
 	Buffer(const Buffer& src);
-	// assignment operator
+	/// assignment operator
 	Buffer& operator=(const Buffer& src);
 
 public:
-	void Swap(Buffer& target);
+	void	Swap(Buffer& target);
 
 public:
 	BSIZE_T	RawLength()													const;
@@ -50,8 +50,8 @@ public:
 	Buffer& RawView(BSIZE_T pos, BSIZE_T length);
 
 private:
-	char* p = NULL;
-	BSIZE_T len = 0;
+	char* rawAddress = NULL;
+	BSIZE_T rawLength = 0;
 
 	// string utility
 public:
@@ -86,8 +86,8 @@ private:
 
 	// file system
 public:
-	bool LoadFromFile(const Buffer& fileName);
-	bool SaveToFile(const Buffer& fileName);
+	bool RawLoadFromFile(const Buffer& fileName);
+	bool RawSaveToFile(const Buffer& fileName);
 
 public:
 	static char* Alloc(BSIZE_T length);

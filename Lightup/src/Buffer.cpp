@@ -13,11 +13,11 @@ Buffer::Buffer(BSIZE_T length)
 {
 	CheckState();
 
-	this->p = Buffer::Alloc(length);
+	this->rawAddress = Buffer::Alloc(length);
 	// be careful, alloc can be failed
-	if (this->p != NULL) 
+	if (this->rawAddress != NULL) 
 	{
-		this->len = length;
+		this->rawLength = length;
 	}
 
 	CheckState();
@@ -32,15 +32,15 @@ Buffer::Buffer(const Buffer& src)
 {
 	CheckState();
 
-	if (src.p != NULL)
+	if (src.rawAddress != NULL)
 	{
-		this->p = Buffer::AllocCopy(src.p, src.len);
+		this->rawAddress = Buffer::AllocCopy(src.rawAddress, src.rawLength);
 
 		// allocate copy can be failed
 
-		if (this->p != NULL)
+		if (this->rawAddress != NULL)
 		{
-			this->len = src.len;
+			this->rawLength = src.rawLength;
 		}
 	}
 
@@ -53,13 +53,13 @@ Buffer::Buffer(const char* str)
 
 	if (str == NULL)
 	{
-		this->p = NULL;
-		this->len = 0;
+		this->rawAddress = NULL;
+		this->rawLength = 0;
 	}
 	else
 	{
-		this->len = strlen(str) + 1;
-		this->p = Buffer::AllocCopy(str, this->len);
+		this->rawLength = strlen(str) + 1;
+		this->rawAddress = Buffer::AllocCopy(str, this->rawLength);
 	}
 
 	CheckState();
@@ -71,13 +71,13 @@ Buffer::Buffer(const wchar_t* str)
 
 	if (str == NULL)
 	{
-		this->p = NULL;
-		this->len = 0;
+		this->rawAddress = NULL;
+		this->rawLength = 0;
 	}
 	else
 	{
-		this->len = wcslen(str) * sizeof(wchar_t) + sizeof(wchar_t);
-		this->p = Buffer::AllocCopy((char*)str, this->len);
+		this->rawLength = wcslen(str) * sizeof(wchar_t) + sizeof(wchar_t);
+		this->rawAddress = Buffer::AllocCopy((char*)str, this->rawLength);
 	}
 
 	CheckState();
@@ -92,40 +92,40 @@ Buffer& Buffer::operator=(const Buffer& src)
 	}
 	else
 	{
-		this->p = Buffer::AllocCopy(src.p, src.len);
-		this->len = src.len;
+		this->rawAddress = Buffer::AllocCopy(src.rawAddress, src.rawLength);
+		this->rawLength = src.rawLength;
 		return *this;
 	}
 }
 
 Buffer::~Buffer()
 {
-	Buffer::Free(&this->p);
+	Buffer::Free(&this->rawAddress);
 }
 
 BSIZE_T Buffer::RawLength() const
 {
-	return this->len;
+	return this->rawLength;
 }
 
 char* Buffer::RawAddress() const
 {
-	return this->p;
+	return this->rawAddress;
 }
 
 Buffer& Buffer::operator=(const char* str)
 {
-	if (this->p != NULL)
+	if (this->rawAddress != NULL)
 	{
-		Buffer::Free(&this->p);
-		this->len = 0;
+		Buffer::Free(&this->rawAddress);
+		this->rawLength = 0;
 	}
 
 	if (str != NULL)
 	{
 		size_t str_len = strlen(str);
-		this->p = Buffer::AllocCopy(str, str_len + 1);
-		this->len = str_len + 1;
+		this->rawAddress = Buffer::AllocCopy(str, str_len + 1);
+		this->rawLength = str_len + 1;
 	}
 
 	return *this;
@@ -133,18 +133,18 @@ Buffer& Buffer::operator=(const char* str)
 
 Buffer& Buffer::operator=(const wchar_t* str)
 {
-	if (this->p != NULL)
+	if (this->rawAddress != NULL)
 	{
-		Buffer::Free(&this->p);
-		this->len = 0;
+		Buffer::Free(&this->rawAddress);
+		this->rawLength = 0;
 	}
 
 	if (str != NULL)
 	{
 		size_t str_len = wcslen(str);
 		size_t buff_len = str_len * sizeof(wchar_t) + sizeof(wchar_t);
-		this->p = Buffer::AllocCopy((char*)str, buff_len);
-		this->len = buff_len;
+		this->rawAddress = Buffer::AllocCopy((char*)str, buff_len);
+		this->rawLength = buff_len;
 	}
 
 	return *this;
@@ -202,10 +202,10 @@ void Buffer::Free(char** p)
 
 bool Buffer::RawReAlloc(BSIZE_T length)
 {
-	if (this->p != NULL)
+	if (this->rawAddress != NULL)
 	{
-		Buffer::Free(&this->p);
-		this->len = 0;
+		Buffer::Free(&this->rawAddress);
+		this->rawLength = 0;
 	}
 
 	if (length < 0)
@@ -218,27 +218,27 @@ bool Buffer::RawReAlloc(BSIZE_T length)
 	}
 	else
 	{
-		this->p = Buffer::Alloc(length);
-		if (this->p != NULL)
+		this->rawAddress = Buffer::Alloc(length);
+		if (this->rawAddress != NULL)
 		{
-			this->len = length;
+			this->rawLength = length;
 			return true;
 		}
 		else
 		{
-			this->len = 0;
+			this->rawLength = 0;
 			return false;
 		}
 	}
 }
 
-bool Buffer::LoadFromFile(const Buffer& fileName)
+bool Buffer::RawLoadFromFile(const Buffer& fileName)
 {
-	if (fileName.p == NULL || fileName.p[fileName.len - 1] != '\0')
+	if (fileName.rawAddress == NULL || fileName.rawAddress[fileName.rawLength - 1] != '\0')
 	{
 		return false;
 	}
-	ifstream in(fileName.p, ios::in | ios::binary | ios::ate);
+	ifstream in(fileName.rawAddress, ios::in | ios::binary | ios::ate);
 	if (!in.is_open())
 	{
 		return false;
@@ -248,39 +248,39 @@ bool Buffer::LoadFromFile(const Buffer& fileName)
 	bool result = this->RawReAlloc(size);
 	if (result)
 	{
-		in.read(this->p, size);
+		in.read(this->rawAddress, size);
 	}
 	in.close();
 	return result;
 }
 
-bool Buffer::SaveToFile(const Buffer& fileName)
+bool Buffer::RawSaveToFile(const Buffer& fileName)
 {
-	if (fileName.p == NULL || fileName.p[fileName.len - 1] != '\0')
+	if (fileName.rawAddress == NULL || fileName.rawAddress[fileName.rawLength - 1] != '\0')
 	{
 		return false;
 	}
-	ofstream out(fileName.p, ios::out | ios::binary);
+	ofstream out(fileName.rawAddress, ios::out | ios::binary);
 	if (!out.is_open())
 	{
 		return false;
 	}
-	out.write(this->p, this->len);
+	out.write(this->rawAddress, this->rawLength);
 	out.close();
 	return true;
 }
 
 bool Buffer::RawIsAllBytesZero() const
 {
-	if (this->p == NULL)
+	if (this->rawAddress == NULL)
 	{
 		return true;
 	}
 	else
 	{
-		for (BSIZE_T i = 0; i < this->len; ++i)
+		for (BSIZE_T i = 0; i < this->rawLength; ++i)
 		{
-			if (this->p[i] != 0)
+			if (this->rawAddress[i] != 0)
 			{
 				return false;
 			}
@@ -292,9 +292,9 @@ bool Buffer::RawIsAllBytesZero() const
 
 bool Buffer::RawSet(BSIZE_T pos, char value)
 {
-	if (this->p != NULL && pos >= 0 && pos < this->len)
+	if (this->rawAddress != NULL && pos >= 0 && pos < this->rawLength)
 	{
-		this->p[pos] = value;
+		this->rawAddress[pos] = value;
 		return true;
 	}
 	else
@@ -307,15 +307,15 @@ bool Buffer::RawSet(BSIZE_T pos, const Buffer& buff)
 {
 	// notice: buff.len can not be zero, so it's impossible to set an empty buff
 
-	if (!(pos >= 0 && pos < this->len) || !(buff.len > 0 && (pos + buff.len) <= this->len))
+	if (!(pos >= 0 && pos < this->rawLength) || !(buff.rawLength > 0 && (pos + buff.rawLength) <= this->rawLength))
 	{
 		return false;
 	}
 	else
 	{
-		for (BSIZE_T i = pos, end = pos + buff.len; i < end; ++i)
+		for (BSIZE_T i = pos, end = pos + buff.rawLength; i < end; ++i)
 		{
-			this->p[i] = buff.p[i];
+			this->rawAddress[i] = buff.rawAddress[i];
 		}
 		return true;
 	}
@@ -323,9 +323,9 @@ bool Buffer::RawSet(BSIZE_T pos, const Buffer& buff)
 
 bool Buffer::RawGet(BSIZE_T pos, char& value) const
 {
-	if (this->p != NULL && pos >= 0 && pos < this->len)
+	if (this->rawAddress != NULL && pos >= 0 && pos < this->rawLength)
 	{
-		value = this->p[pos];
+		value = this->rawAddress[pos];
 		return true;
 	}
 	else
@@ -336,33 +336,33 @@ bool Buffer::RawGet(BSIZE_T pos, char& value) const
 
 void Buffer::RawRandomize()
 {
-	if (this->p != NULL)
+	if (this->rawAddress != NULL)
 	{
-		for (BSIZE_T i = 0; i < this->len; ++i)
+		for (BSIZE_T i = 0; i < this->rawLength; ++i)
 		{
-			this->p[i] = random_engine();
+			this->rawAddress[i] = random_engine();
 		}
 	}
 }
 
 bool Buffer::RawEquals(const Buffer& target) const
 {
-	if (target.p == NULL && this->p == NULL)
+	if (target.rawAddress == NULL && this->rawAddress == NULL)
 	{
 		return true;
 	}
-	else if (target.len == this->len)
+	else if (target.rawLength == this->rawLength)
 	{
 		// optimize
 
-		if (target.p == this->p)
+		if (target.rawAddress == this->rawAddress)
 		{
 			return true;
 		}
 
-		for (BSIZE_T i = 0; i < this->len; ++i)
+		for (BSIZE_T i = 0; i < this->rawLength; ++i)
 		{
-			if (this->p[i] != target.p[i])
+			if (this->rawAddress[i] != target.rawAddress[i])
 			{
 				return false;
 			}
@@ -378,12 +378,12 @@ bool Buffer::RawEquals(const Buffer& target) const
 
 void Buffer::Swap(Buffer& target)
 {
-	char* tmp_p = target.p;
-	BSIZE_T tmp_len = target.len;
-	target.p = this->p;
-	target.len = this->len;
-	this->p = tmp_p;
-	this->len = tmp_len;
+	char* tmp_p = target.rawAddress;
+	BSIZE_T tmp_len = target.rawLength;
+	target.rawAddress = this->rawAddress;
+	target.rawLength = this->rawLength;
+	this->rawAddress = tmp_p;
+	this->rawLength = tmp_len;
 }
 
 bool Buffer::RawResize(BSIZE_T new_len)
@@ -392,16 +392,16 @@ bool Buffer::RawResize(BSIZE_T new_len)
 	{
 		return false;
 	}
-	else if (new_len == this->len)
+	else if (new_len == this->rawLength)
 	{
 		return true;
 	}
 	else if (new_len == 0)
 	{
-		if (this->p != NULL)
+		if (this->rawAddress != NULL)
 		{
-			Buffer::Free(&this->p);
-			this->len = 0;
+			Buffer::Free(&this->rawAddress);
+			this->rawLength = 0;
 		}
 
 		return true;
@@ -417,20 +417,20 @@ bool Buffer::RawResize(BSIZE_T new_len)
 		else
 		{
 			// copy data as needed
-			if (this->p != NULL)
+			if (this->rawAddress != NULL)
 			{
-				BSIZE_T min_len = this->len < new_len ? this->len : new_len;
+				BSIZE_T min_len = this->rawLength < new_len ? this->rawLength : new_len;
 				for (BSIZE_T i = 0; i < min_len; ++i)
 				{
-					new_p[i] = this->p[i];
+					new_p[i] = this->rawAddress[i];
 				}
 
 				// free resources
-				Buffer::Free(&this->p);
+				Buffer::Free(&this->rawAddress);
 			}
 
-			this->p = new_p;
-			this->len = new_len;
+			this->rawAddress = new_p;
+			this->rawLength = new_len;
 
 			return true;
 		}
@@ -441,7 +441,7 @@ bool Buffer::RawGet(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
 {
 	// notice: length can not be zero, so it's impossible to get an empty buff
 
-	if (!(pos >= 0 && pos < this->len) || !(length > 0 && (length + pos) <= this->len))
+	if (!(pos >= 0 && pos < this->rawLength) || !(length > 0 && (length + pos) <= this->rawLength))
 	{
 		return false;
 	}
@@ -455,7 +455,7 @@ bool Buffer::RawGet(BSIZE_T pos, BSIZE_T length, Buffer& buff) const
 		{
 			for (BSIZE_T i = 0; i < length; ++i)
 			{
-				buff.p[i] = this->p[i + pos];
+				buff.rawAddress[i] = this->rawAddress[i + pos];
 			}
 			return true;
 		}
@@ -472,15 +472,15 @@ bool Buffer::RawMerge(BSIZE_T pos, const Buffer& buff)
 		pos = -pos;
 	}
 
-	if (_this.len < pos + _buff.len)
+	if (_this.rawLength < pos + _buff.rawLength)
 	{
-		if (!_this.RawResize(pos + _buff.len))
+		if (!_this.RawResize(pos + _buff.rawLength))
 		{
 			return false;
 		}
 	}
 
-	if (_buff.len > 0) 
+	if (_buff.rawLength > 0) 
 	{
 		if (!_this.RawSet(pos, _buff))
 		{
@@ -495,26 +495,26 @@ bool Buffer::RawMerge(BSIZE_T pos, const Buffer& buff)
 
 bool Buffer::RawPrepend(const Buffer& buff)
 {
-	return this->RawMerge(-buff.len, buff);
+	return this->RawMerge(-buff.rawLength, buff);
 }
 
 bool Buffer::RawAppend(const Buffer& buff)
 {
-	return this->RawMerge(this->len, buff);
+	return this->RawMerge(this->rawLength, buff);
 }
 
 bool Buffer::RawInsert(BSIZE_T pos, const Buffer& buff)
 {
-	if (pos > this->len)
+	if (pos > this->rawLength)
 	{
 		return false;
 		//pos = this->len;
 	}
 
 	Buffer _tail;
-	if (this->len > pos)
+	if (this->rawLength > pos)
 	{
-		if (!this->RawGet(pos, this->len - pos, _tail))
+		if (!this->RawGet(pos, this->rawLength - pos, _tail))
 		{
 			return false;
 		}
@@ -530,15 +530,15 @@ bool Buffer::RawInsert(BSIZE_T pos, const Buffer& buff)
 
 bool Buffer::RawRemove(BSIZE_T pos, BSIZE_T length)
 {
-	if (pos >= this->len || length == 0)
+	if (pos >= this->rawLength || length == 0)
 	{
 		return false;
 	}
 
 	Buffer _tail;
-	if (this->len > pos + length)
+	if (this->rawLength > pos + length)
 	{
-		if (!this->RawGet(pos + length, this->len - pos - length, _tail))
+		if (!this->RawGet(pos + length, this->rawLength - pos - length, _tail))
 		{
 			return false;
 		}
@@ -554,11 +554,11 @@ bool Buffer::RawRemove(BSIZE_T pos, BSIZE_T length)
 void Buffer::RawReverse()
 {
 	char temp;
-	for (BSIZE_T i = 0; i < this->len / 2; ++i)
+	for (BSIZE_T i = 0; i < this->rawLength / 2; ++i)
 	{
-		temp = this->p[i];
-		this->p[i] = this->p[this->len - 1 - i];
-		this->p[this->len - 1 - i] = temp;
+		temp = this->rawAddress[i];
+		this->rawAddress[i] = this->rawAddress[this->rawLength - 1 - i];
+		this->rawAddress[this->rawLength - 1 - i] = temp;
 	}
 }
 
@@ -633,7 +633,7 @@ bool Buffer::isLBStringMode()
 
 void Buffer::CheckState() const
 {
-	assert(this->p != NULL ? this->len > 0 : this->len == 0);
+	assert(this->rawAddress != NULL ? this->rawLength > 0 : this->rawLength == 0);
 }
 
 

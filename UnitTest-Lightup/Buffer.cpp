@@ -446,18 +446,18 @@ TEST(BufferTest, SaveToFile_LoadFromFile) {
 
 	Buffer fileName;
 	fileName = "c:\\test.txt";
-	EXPECT_TRUE(b1.SaveToFile(fileName));
-	EXPECT_TRUE(b2.LoadFromFile(fileName));
+	EXPECT_TRUE(b1.RawSaveToFile(fileName));
+	EXPECT_TRUE(b2.RawLoadFromFile(fileName));
 	EXPECT_TRUE(b1.RawEquals(b2));
 	b1.RawRandomize();
-	EXPECT_TRUE(b1.SaveToFile(fileName));
-	EXPECT_TRUE(b2.LoadFromFile(fileName));
+	EXPECT_TRUE(b1.RawSaveToFile(fileName));
+	EXPECT_TRUE(b2.RawLoadFromFile(fileName));
 	EXPECT_TRUE(b1.RawEquals(b2));
 
 	Buffer errorFileName(5);
 	errorFileName.RawRandomize();
-	EXPECT_FALSE(b1.SaveToFile(errorFileName));
-	EXPECT_FALSE(b2.LoadFromFile(errorFileName));
+	EXPECT_FALSE(b1.RawSaveToFile(errorFileName));
+	EXPECT_FALSE(b2.RawLoadFromFile(errorFileName));
 }
 
 TEST(BufferTest, Merge) {
