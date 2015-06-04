@@ -7,6 +7,12 @@
 /// Make the memory related works easier.
 class Buffer
 {
+	enum Mode
+	{
+		Raw,
+		String
+	};
+
 public:
 	/// Raw mode default constructor, no memory allocated
 	Buffer();
@@ -27,9 +33,37 @@ public:
 	/// destructor
 	~Buffer();
 
+private:
+	// common
+	Mode mode = Raw;
+	// raw mode
+	char* rawAddress = NULL;
+	BSIZE_T rawLength = 0;
+	// string mode
+	char*	strEncoding = NULL;
+	BSIZE_T	strLength = 0;
+
+	// Mode
 public:
-	/// swap every thing with target buffer
+	bool	toRawMode();
+	bool	isRawMode();
+	bool	toStringMode();
+	bool	isStringMode();
+
+private:
+	void CheckState()	const;
+	bool ConvertMode(Mode toMode);
+
+public:
+	/// swap every thing with target
 	void	Swap(Buffer& target);
+	/// free all the resources used in raw mode, 
+	///		won't touch any resources not belongs to raw mode. 
+	///		after invoking this->rawAddress will be null and this->rawLength will be zero.
+	bool	RawClear();
+	/// free all the resources used in string mode
+	///		after invoking this.
+	bool	StrClear();
 	/// free resources and reset state
 	void	Clear();
 
@@ -97,14 +131,9 @@ private:
 	bool	_RawRemove(BSIZE_T pos, BSIZE_T length);
 	bool	_RawReverse();
 	Buffer& _RawView(BSIZE_T pos, BSIZE_T length);
-	// file system
-public:
-	bool _RawLoadFromFile(const Buffer& fileName);
-	bool _RawSaveToFile(const Buffer& fileName);
-
-private:
-	char* rawAddress = NULL;
-	BSIZE_T rawLength = 0;
+	bool	_RawLoadFromFile(const Buffer& fileName);
+	bool	_RawSaveToFile(const Buffer& fileName);
+	bool	_RawClear();
 
 	// string mode
 public:
@@ -157,40 +186,18 @@ public:
 	bool	StrReverse();
 	bool	StrRandomize(BSIZE_T length);
 	bool	StrEquals(const Buffer& target, bool ignoreCase);
-	bool	StrClear();
 	bool	StrGet(BSIZE_T pos, char& c);
 	bool	StrGet(BSIZE_T pos, wchar_t& c);
 	bool	StrSet(BSIZE_T pos, char c);
 	bool	StrSet(BSIZE_T pos, wchar_t c);
 
 private:
-	char*	strEncoding = NULL;
-	BSIZE_T	strLength = 0;
+	// free this->strEncoding then assign it null
+	void	_FreeStrEncoding();
 
 public:
 	static char* Alloc(BSIZE_T length);
 	static char* AllocCopy(const char* src, BSIZE_T length);
 	static void Free(char** p);
-
-	// Mode
-public:
-	bool	toRawMode();
-	bool	isRawMode();
-	bool	toStringMode();
-	bool	isStringMode();
-
-private:
-	enum Mode
-	{
-		Raw,
-		String
-	};
-	bool ConvertMode(Mode toMode);
-
-private:
-	Mode mode = Raw;
-
-private:
-	void CheckState()	const;
 };
 

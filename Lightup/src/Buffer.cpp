@@ -125,7 +125,18 @@ Buffer& Buffer::operator=(const Buffer& src)
 
 Buffer::~Buffer()
 {
-	Buffer::Free(&this->rawAddress);
+	if (this->mode == Raw)
+	{
+		RawClear();
+	}
+	else if (this->mode == String)
+	{
+		StrClear();
+	}
+	else
+	{
+		assert(false);
+	}
 }
 
 BSIZE_T Buffer::RawLength() const
@@ -404,12 +415,13 @@ bool Buffer::RawEquals(const Buffer& target) const
 
 void Buffer::Swap(Buffer& target)
 {
-	char* tmp_p = target.rawAddress;
-	BSIZE_T tmp_len = target.rawLength;
-	target.rawAddress = this->rawAddress;
-	target.rawLength = this->rawLength;
-	this->rawAddress = tmp_p;
-	this->rawLength = tmp_len;
+	assert(false);
+// 	char* tmp_p = target.rawAddress;
+// 	BSIZE_T tmp_len = target.rawLength;
+// 	target.rawAddress = this->rawAddress;
+// 	target.rawLength = this->rawLength;
+// 	this->rawAddress = tmp_p;
+// 	this->rawLength = tmp_len;
 }
 
 bool Buffer::_RawResize(BSIZE_T new_len)
@@ -658,9 +670,6 @@ void Buffer::CheckState() const
 bool Buffer::_RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
 {
 	CheckState();
-
-	// TODO
-
 	CheckState();
 	return false;
 }
@@ -816,4 +825,46 @@ bool Buffer::RawSaveToFile(const Buffer& fileName)
 {
 	ModeMustBe(Raw);
 	return _RawSaveToFile(fileName);
+}
+
+bool Buffer::_RawClear()
+{
+	CheckState();
+	if (this->rawAddress != NULL)
+	{
+		Buffer::Free(&this->rawAddress);
+		this->rawLength = 0;
+	}
+	CheckState();
+	return true;
+}
+
+bool Buffer::RawClear()
+{
+	ModeMustBe(Raw);
+	return _RawClear();
+}
+
+bool Buffer::StrClear()
+{
+	ModeMustBe(String);
+	// clear string mode level state
+	_FreeStrEncoding();
+	this->strLength = 0;
+	// clear raw mode level state
+	_RawClear();
+	return true;
+}
+
+void Buffer::_FreeStrEncoding()
+{
+	if (this->strEncoding == NULL) return;
+	if (this->strEncoding == char_encoding || this->strEncoding == wchar_t_encoding)
+	{
+		this->strEncoding = NULL;
+	}
+	else
+	{
+		Buffer::Free(&this->strEncoding);
+	}
 }
