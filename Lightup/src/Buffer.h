@@ -25,8 +25,8 @@ public:
 public:
 	BSIZE_T	RawLength()													const;
 	char*	RawAddress()													const;
-	bool	CopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset = 0);
-	bool	CopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset = 0);
+	bool	RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset = 0);
+	bool	RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset = 0);
 	bool	CopyTo(const char* dst, BSIZE_T lengthToCopy)					const;
 	bool	CopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy)	const;
 	bool	ReAlloc(BSIZE_T length);
