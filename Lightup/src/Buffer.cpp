@@ -17,26 +17,26 @@ Buffer::Buffer(BSIZE_T length)
 {
 	assert(this->mode == Raw);
 	assert(this->rawAddress == NULL);
-	CheckState();
+	VerifyState();
 	this->rawAddress = Buffer::Alloc(length);
 	// be careful, alloc can be failed
 	if (this->rawAddress != NULL) 
 	{
 		this->rawLength = length;
 	}
-	CheckState();
+	VerifyState();
 }
 
 Buffer::Buffer()
 {
 	assert(this->mode == Raw);
 	assert(this->rawAddress == NULL);
-	CheckState();
+	VerifyState();
 }
 
 Buffer::Buffer(const Buffer& src)
 {
-	CheckState();
+	VerifyState();
 
 	if (src.rawAddress != NULL)
 	{
@@ -50,14 +50,14 @@ Buffer::Buffer(const Buffer& src)
 		}
 	}
 
-	CheckState();
+	VerifyState();
 }
 
 Buffer::Buffer(const char* str)
 {
 	assert(this->mode == Raw);
 	assert(this->rawAddress == NULL);
-	CheckState();
+	VerifyState();
 	// set mode to String
 	this->mode = String;
 	// set encoding name to char
@@ -87,12 +87,12 @@ Buffer::Buffer(const char* str)
 		}
 	}
 
-	CheckState();
+	VerifyState();
 }
 
 Buffer::Buffer(const wchar_t* str)
 {
-	CheckState();
+	VerifyState();
 
 	if (str == NULL)
 	{
@@ -105,7 +105,7 @@ Buffer::Buffer(const wchar_t* str)
 		this->rawAddress = Buffer::AllocCopy((char*)str, this->rawLength);
 	}
 
-	CheckState();
+	VerifyState();
 }
 
 Buffer& Buffer::operator=(const Buffer& src)
@@ -660,7 +660,7 @@ bool Buffer::isStringMode()
 	return String == this->mode;
 }
 
-void Buffer::CheckState() const
+void Buffer::VerifyState() const
 {
 	assert(this->rawAddress != NULL ? this->rawLength > 0 : this->rawLength == 0);
 	assert(this->mode != String ? (this->strEncoding == NULL && this->strLength == 0) : true);
@@ -669,8 +669,8 @@ void Buffer::CheckState() const
 
 bool Buffer::_RawCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
 {
-	CheckState();
-	CheckState();
+	VerifyState();
+	VerifyState();
 	return false;
 }
 
@@ -681,9 +681,9 @@ bool Buffer::_RawCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffs
 
 bool Buffer::RawCopyTo(const char* dst, BSIZE_T dstOffset, BSIZE_T dstSafeLength, BSIZE_T srcOffset, BSIZE_T lengthToCopy) const
 {
-	CheckState();
+	VerifyState();
 	// TODO
-	CheckState();
+	VerifyState();
 	return false;
 }
 
@@ -694,7 +694,7 @@ bool Buffer::RawCopyTo(const char* dst, BSIZE_T lengthToCopy) const
 
 void Buffer::Clear()
 {
-	CheckState();
+	VerifyState();
 	this->mode = Raw;
 	if (this->rawAddress != NULL)
 	{
@@ -710,7 +710,7 @@ void Buffer::Clear()
 		this->strEncoding = NULL;
 	}
 	this->strLength = 0;
-	CheckState();
+	VerifyState();
 }
 
 bool Buffer::StrCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
@@ -720,7 +720,7 @@ bool Buffer::StrCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffse
 
 bool Buffer::StrCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
 {
-	CheckState();
+	VerifyState();
 	// TODO
 	return false;
 }
@@ -732,7 +732,7 @@ bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T lengthToCopy, BSIZE_T dstOf
 
 bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset /*= 0*/)
 {
-	CheckState();
+	VerifyState();
 	// TODO
 	return false;
 }
@@ -829,13 +829,13 @@ bool Buffer::RawSaveToFile(const Buffer& fileName)
 
 bool Buffer::_RawClear()
 {
-	CheckState();
+	VerifyState();
 	if (this->rawAddress != NULL)
 	{
 		Buffer::Free(&this->rawAddress);
 		this->rawLength = 0;
 	}
-	CheckState();
+	VerifyState();
 	return true;
 }
 

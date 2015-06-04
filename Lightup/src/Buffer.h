@@ -35,10 +35,10 @@ public:
 
 private:
 	// common
-	Mode mode = Raw;
+	Mode	mode = Raw;
 	// raw mode
-	char* rawAddress = NULL;
-	BSIZE_T rawLength = 0;
+	char*	rawAddress = NULL;
+	BSIZE_T	rawLength = 0;
 	// string mode
 	char*	strEncoding = NULL;
 	BSIZE_T	strLength = 0;
@@ -51,20 +51,23 @@ public:
 	bool	isStringMode();
 
 private:
-	void CheckState()	const;
-	bool ConvertMode(Mode toMode);
+	void	VerifyState()	const;
+	bool	ConvertMode(Mode toMode);
 
 public:
 	/// swap every thing with target
 	void	Swap(Buffer& target);
 	/// free all the resources used in raw mode, 
 	///		won't touch any resources not belongs to raw mode. 
-	///		after invoking this->rawAddress will be null and this->rawLength will be zero.
+	///		after invoking (rawAddress == null && rawLength == 0).
 	bool	RawClear();
-	/// free all the resources used in string mode
-	///		after invoking this.
+	/// free all the resources used in string mode, 
+	///		after invoking (strEncoding == null && strLength == 0), 
+	///		will invoke _RawClear() internally.
 	bool	StrClear();
-	/// free resources and reset state
+	/// free all the resources no matter what mode current is, 
+	///		after invoking (mode == Raw), 
+	//		will invoke _RawClear() or _StrClear() internally.
 	void	Clear();
 
 public:
@@ -196,8 +199,8 @@ private:
 	void	_FreeStrEncoding();
 
 public:
-	static char* Alloc(BSIZE_T length);
-	static char* AllocCopy(const char* src, BSIZE_T length);
-	static void Free(char** p);
+	static char*	Alloc(BSIZE_T length);
+	static char*	AllocCopy(const char* src, BSIZE_T length);
+	static void		Free(char** p);
 };
 
