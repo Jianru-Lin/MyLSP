@@ -12,7 +12,7 @@ TEST(BufferTest, Positive) {
 }
 
 TEST(BufferTest, Zero) {
-	Buffer b1(0);
+	Buffer b1((SIZE_T)0);
 	EXPECT_EQ(0, b1.Length());
 	EXPECT_TRUE(b1.Address() == NULL);
 }

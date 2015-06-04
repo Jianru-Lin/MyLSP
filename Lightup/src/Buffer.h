@@ -1,8 +1,10 @@
 #pragma once
+
 class Buffer
 {
 public:
 	Buffer();
+	Buffer(const char* p, SIZE_T length);
 	Buffer(SIZE_T length);
 	~Buffer();
 
@@ -38,6 +40,8 @@ private:
 
 	// string utility
 public:
+	Buffer(const char* str);
+	Buffer(const wchar_t* str);
 	Buffer& operator=(const char* str);
 	Buffer& operator=(const wchar_t* str);
 	bool	StrGetEncoding(Buffer& encoding);
@@ -61,6 +65,10 @@ public:
 	bool	StrSet(SIZE_T pos, char c);
 	bool	StrSet(SIZE_T pos, wchar_t c);
 
+private:
+	char*	strEncoding = NULL;
+	SSIZE_T	strLength = 0;
+
 	// file system
 public:
 	bool LoadFromFile(const Buffer& fileName);
@@ -71,5 +79,28 @@ public:
 	static char* AllocCopy(const char* src, SIZE_T length);
 	static void Free(char** p);
 
+	// Mode
+public:
+	bool	toRawMode();
+	bool	isRawMode();
+	bool	toNTStringMode();
+	bool	isNTStringMode();
+	bool	toLBStringMode();
+	bool	isLBStringMode();
+
+private:
+	enum Mode
+	{
+		Raw,
+		NTString,	// Null Terminated String
+		LBString	// Length Based String
+	};
+	bool ConvertMode(Mode toMode);
+
+private:
+	Mode mode = Raw;
+
+private:
+	void CheckState();
 };
 

@@ -11,28 +11,29 @@ static default_random_engine random_engine;
 
 Buffer::Buffer(SIZE_T length)
 {
+	CheckState();
+
 	this->p = Buffer::Alloc(length);
+	// be careful, alloc can be failed
 	if (this->p != NULL) 
 	{
 		this->len = length;
 	}
-	else 
-	{
-		// this->len will be zero
-	}
+
+	CheckState();
 }
 
 Buffer::Buffer()
 {
-
+	CheckState();
 }
 
 Buffer::Buffer(const Buffer& src)
 {
+	CheckState();
+
 	if (src.p != NULL)
 	{
-		assert(src.len > 0);
-
 		this->p = Buffer::AllocCopy(src.p, src.len);
 
 		// allocate copy can be failed
@@ -42,6 +43,62 @@ Buffer::Buffer(const Buffer& src)
 			this->len = src.len;
 		}
 	}
+
+	CheckState();
+}
+
+Buffer::Buffer(const char* p, SIZE_T length)
+{
+	CheckState();
+
+	if (p == NULL || (p != NULL && length == 0))
+	{
+		this->p = NULL;
+		this->len = 0;
+	}
+	else
+	{
+		this->p = Buffer::AllocCopy(p, length);
+		this->len = length;
+	}
+
+	CheckState();
+}
+
+Buffer::Buffer(const char* str)
+{
+	CheckState();
+
+	if (str == NULL)
+	{
+		this->p = NULL;
+		this->len = 0;
+	}
+	else
+	{
+		this->len = strlen(str) + 1;
+		this->p = Buffer::AllocCopy(str, this->len);
+	}
+
+	CheckState();
+}
+
+Buffer::Buffer(const wchar_t* str)
+{
+	CheckState();
+
+	if (str == NULL)
+	{
+		this->p = NULL;
+		this->len = 0;
+	}
+	else
+	{
+		this->len = wcslen(str) * sizeof(wchar_t) + sizeof(wchar_t);
+		this->p = Buffer::AllocCopy((char*)str, this->len);
+	}
+
+	CheckState();
 }
 
 Buffer& Buffer::operator=(const Buffer& src)
@@ -531,12 +588,68 @@ Buffer& Buffer::View(SIZE_T pos, SIZE_T length)
 
 bool Buffer::StrConvertToEncoding(const Buffer& toEncoding)
 {
+	assert(&toEncoding != this);
 	// TODO
 	return false;
 }
 
 bool Buffer::StrGetEncoding(Buffer& encoding)
 {
-	// TODO
 	return false;
+}
+
+bool Buffer::StrSetEncoding(const Buffer& encoding)
+{
+	return false;
+}
+
+bool Buffer::isRawMode()
+{
+	return Raw == this->mode;
+}
+
+bool Buffer::toRawMode()
+{
+	return ConvertMode(Raw);
+}
+
+bool Buffer::toNTStringMode()
+{
+	return ConvertMode(NTString);
+}
+
+bool Buffer::ConvertMode(Mode toMode)
+{
+	if (toMode == this->mode) {
+		return true;
+	}
+	else if (toMode == Raw) {
+		// any mode convert to raw mode is ok
+		this->mode = Raw;
+		return true;
+	}
+	else {
+		// TODO
+		return false;
+	}
+}
+
+bool Buffer::isNTStringMode()
+{
+	return NTString == this->mode;
+}
+
+bool Buffer::toLBStringMode()
+{
+	return ConvertMode(LBString);
+}
+
+bool Buffer::isLBStringMode()
+{
+	return LBString == this->mode;
+}
+
+void Buffer::CheckState()
+{
+	assert(this->p != NULL ? this->len > 0 : this->len == 0);
 }
