@@ -23,7 +23,7 @@ public:
 	Buffer& operator=(const Buffer& src);
 
 public:
-	BSIZE_T	Length()													const;
+	BSIZE_T	RawLength()													const;
 	char*	Address()													const;
 	bool	CopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset = 0);
 	bool	CopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, SIZE_T dstOffset = 0);

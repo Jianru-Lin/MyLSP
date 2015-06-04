@@ -103,7 +103,7 @@ Buffer::~Buffer()
 	Buffer::Free(&this->p);
 }
 
-BSIZE_T Buffer::Length() const
+BSIZE_T Buffer::RawLength() const
 {
 	return this->len;
 }
