@@ -1,6 +1,7 @@
 #include <Lightup.h>
 #include <gtest/gtest.h>
 
+/*
 TEST(BufferTest, Positive) {
 	Buffer b1(1);
 	EXPECT_EQ(1, b1.RawLength());
@@ -532,3 +533,4 @@ TEST(BufferTest, Reverse) {
 	b2.RawGet(50, c2);
 	EXPECT_EQ(c1, c2);
 }
+*/
