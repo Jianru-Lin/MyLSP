@@ -55,6 +55,8 @@ private:
 	bool	ConvertMode(Mode toMode);
 
 public:
+	/// clone from another buffer
+	bool	CloneFrom(const Buffer& target);
 	/// swap every thing with target
 	void	SwapWith(Buffer& target);
 	/// free all the resources used in raw mode, 
@@ -67,7 +69,7 @@ public:
 	bool	StrClear();
 	/// free all the resources no matter what mode current is, 
 	///		after invoking (mode == Raw), 
-	//		will invoke _RawClear() or _StrClear() internally.
+	//		will invoke _RawClear(), _StrClear() internally.
 	void	Clear();
 
 public:
@@ -197,6 +199,7 @@ public:
 private:
 	// free this->strEncoding then assign it null
 	void	_FreeStrEncoding();
+	bool	_CopyStrEncodingFrom(const char* value);
 
 public:
 	static char*	Alloc(BSIZE_T length);

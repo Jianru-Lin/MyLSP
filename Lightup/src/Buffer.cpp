@@ -37,21 +37,11 @@ Buffer::Buffer()
 
 Buffer::Buffer(const Buffer& src)
 {
-	VerifyState();
-
-	if (src.rawAddress != NULL)
+	if (!CloneFrom(src))
 	{
-		this->rawAddress = Buffer::AllocCopy(src.rawAddress, src.rawLength);
-
-		// allocate copy can be failed
-
-		if (this->rawAddress != NULL)
-		{
-			this->rawLength = src.rawLength;
-		}
+		// throw exception here
+		// TODO
 	}
-
-	VerifyState();
 }
 
 Buffer::Buffer(const char* str)
@@ -59,7 +49,11 @@ Buffer::Buffer(const char* str)
 	assert(this->mode == Raw);
 	assert(this->rawAddress == NULL);
 	this->mode = String;
-	StrCopyFrom(str, -1);
+	if (!StrCopyFrom(str, -1))
+	{
+		// throw exception
+		// TODO
+	}
 }
 
 Buffer::Buffer(const wchar_t* str)
@@ -67,22 +61,22 @@ Buffer::Buffer(const wchar_t* str)
 	assert(this->mode == Raw);
 	assert(this->rawAddress == NULL);
 	this->mode = String;
-	StrCopyFrom(str, -1);
+	if (!StrCopyFrom(str, -1))
+	{
+		// throw exception
+		// TODO
+	}
 }
 
 Buffer& Buffer::operator=(const Buffer& src)
 {
-	const Buffer* p_src = &src;
-	if (p_src == this)
+	if (!CloneFrom(src))
 	{
-		return *this;
+		// throw exception here
+		// TODO
 	}
-	else
-	{
-		this->rawAddress = Buffer::AllocCopy(src.rawAddress, src.rawLength);
-		this->rawLength = src.rawLength;
-		return *this;
-	}
+
+	return *this;
 }
 
 Buffer::~Buffer()
@@ -105,7 +99,12 @@ Buffer& Buffer::operator=(const char* str)
 	this->Clear();
 	this->mode = String;
 	this->strEncoding = char_encoding;
-	this->StrCopyFrom(str, -1);
+	if (!this->StrCopyFrom(str, -1))
+	{
+		// oops
+		// throw exception
+		// TODO
+	}
 	return *this;
 }
 
@@ -114,7 +113,12 @@ Buffer& Buffer::operator=(const wchar_t* str)
 	this->Clear();
 	this->mode = String;
 	this->strEncoding = wchar_t_encoding;
-	this->StrCopyFrom(str, -1);
+	if (!this->StrCopyFrom(str, -1))
+	{
+		// oops
+		// throw exception
+		// TODO
+	}
 	return *this;
 }
 
@@ -743,6 +747,8 @@ void Buffer::Clear()
 	else if (this->mode == String)
 	{
 		StrClear();
+		this->mode = Raw;
+		RawClear();
 	}
 	else
 	{
@@ -924,4 +930,78 @@ void Buffer::_FreeStrEncoding()
 	{
 		Buffer::Free(&this->strEncoding);
 	}
+}
+
+bool Buffer::CloneFrom(const Buffer& target)
+{
+	// ignore clone from self
+
+	if (this == &target)
+	{
+		return true;
+	}
+
+	target.VerifyState();
+	this->VerifyState();
+
+	// create an tmp buffer for operating
+	// this prevent any status lost when error occursed
+	Buffer tmp;
+	tmp.VerifyState();
+	tmp.mode = target.mode;
+	if (target.rawAddress != NULL)
+	{
+		tmp.rawAddress = Buffer::AllocCopy(target.rawAddress, target.rawLength);
+		if (tmp.rawAddress == NULL)
+		{
+			// opps, allocate memory failed
+			// but it's fine, my state won't change
+			return false;
+		}
+	}
+	tmp.rawLength = target.rawLength;
+	if (!tmp._CopyStrEncodingFrom(target.strEncoding))
+	{
+		// opps, failed
+		return false;
+	}
+	tmp.strLength = target.strLength;
+	tmp.VerifyState();
+
+	// well, success
+	// swap now
+	this->SwapWith(tmp);
+
+	this->VerifyState();
+
+	// done.
+	return true;
+}
+
+bool Buffer::_CopyStrEncodingFrom(const char* value)
+{
+	this->_FreeStrEncoding();
+	if (value == char_encoding)
+	{
+		this->strEncoding = char_encoding;
+	}
+	else if (value == wchar_t_encoding)
+	{
+		this->strEncoding = wchar_t_encoding;
+	}
+	else if (value != NULL)
+	{
+		char *tmp = Buffer::AllocCopy(value, strlen(value) + 1);
+		if (tmp == NULL)
+		{
+			// allocate memory failed
+			// but it's fine, my state won't change
+			return false;
+		}
+
+		this->strEncoding = tmp;
+	}
+
+	// done.
+	return true;
 }
