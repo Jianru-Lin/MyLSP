@@ -102,38 +102,19 @@ char* Buffer::RawAddress() const
 
 Buffer& Buffer::operator=(const char* str)
 {
-	if (this->rawAddress != NULL)
-	{
-		Buffer::Free(&this->rawAddress);
-		this->rawLength = 0;
-	}
-
-	if (str != NULL)
-	{
-		size_t str_len = strlen(str);
-		this->rawAddress = Buffer::AllocCopy(str, str_len + 1);
-		this->rawLength = str_len + 1;
-	}
-
+	this->Clear();
+	this->mode = String;
+	this->strEncoding = char_encoding;
+	this->StrCopyFrom(str, -1);
 	return *this;
 }
 
 Buffer& Buffer::operator=(const wchar_t* str)
 {
-	if (this->rawAddress != NULL)
-	{
-		Buffer::Free(&this->rawAddress);
-		this->rawLength = 0;
-	}
-
-	if (str != NULL)
-	{
-		size_t str_len = wcslen(str);
-		size_t buff_len = str_len * sizeof(wchar_t) + sizeof(wchar_t);
-		this->rawAddress = Buffer::AllocCopy((char*)str, buff_len);
-		this->rawLength = buff_len;
-	}
-
+	this->Clear();
+	this->mode = String;
+	this->strEncoding = wchar_t_encoding;
+	this->StrCopyFrom(str, -1);
 	return *this;
 }
 
@@ -779,7 +760,16 @@ bool Buffer::StrCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCop
 {
 	ModeMustBe(String);
 	VerifyState();
-	// TODO
+	if (this->strEncoding == char_encoding)
+	{
+		// same encoding
+		// TODO
+	}
+	else
+	{
+		// different encoding
+		// TODO
+	}
 	return false;
 }
 
@@ -791,7 +781,16 @@ bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T lengthToCopy, BSIZE_T dstOf
 bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, BSIZE_T dstOffset /*= 0*/)
 {
 	VerifyState();
-	// TODO
+	if (this->strEncoding == wchar_t_encoding)
+	{
+		// same encoding
+		// TODO
+	}
+	else
+	{
+		// different encoding
+		// TODO
+	}
 	return false;
 }
 
