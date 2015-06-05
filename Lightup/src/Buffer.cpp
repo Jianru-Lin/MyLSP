@@ -351,13 +351,23 @@ bool Buffer::RawEquals(const Buffer& target) const
 
 void Buffer::SwapWith(Buffer& target)
 {
-	assert(false);
-// 	char* tmp_p = target.rawAddress;
-// 	BSIZE_T tmp_len = target.rawLength;
-// 	target.rawAddress = this->rawAddress;
-// 	target.rawLength = this->rawLength;
-// 	this->rawAddress = tmp_p;
-// 	this->rawLength = tmp_len;
+	Mode tmp_mode = target.mode;
+	char* tmp_rawAddress = target.rawAddress;
+	BSIZE_T tmp_rawLength = target.rawLength;
+	char* tmp_strEncoding = target.strEncoding;
+	BSIZE_T tmp_strLength = target.strLength;
+
+	target.mode = this->mode;
+	target.rawAddress = this->rawAddress;
+	target.rawLength = this->rawLength;
+	target.strEncoding = this->strEncoding;
+	target.strLength = this->strLength;
+
+	this->mode = tmp_mode;
+	this->rawAddress = tmp_rawAddress;
+	this->rawLength = tmp_rawLength;
+	this->strEncoding = tmp_strEncoding;
+	this->strLength = tmp_strLength;
 }
 
 bool Buffer::_RawResize(BSIZE_T new_len)
@@ -598,6 +608,8 @@ bool Buffer::isStringMode()
 
 void Buffer::VerifyState() const
 {
+	assert(this->rawLength >= 0);
+	assert(this->strLength >= 0);
 	assert(this->rawAddress != NULL ? this->rawLength > 0 : this->rawLength == 0);
 	assert(this->mode != String ? (this->strEncoding == NULL && this->strLength == 0) : true);
 }

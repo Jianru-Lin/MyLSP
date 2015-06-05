@@ -18,6 +18,10 @@ public:
 	Buffer();
 	/// Raw mode constructor, allocate specified length of memory
 	Buffer(BSIZE_T length);
+	/// common copy constructor
+	Buffer(const Buffer& src);
+	/// common assignment operator
+	Buffer& operator=(const Buffer& src);
 	/// String mode constructor, str must be null terminated, encoding name will be "char"
 	Buffer(const char* str);
 	/// String mode constructor, str must be null terminated, encoding name will be "wchar_t"
@@ -26,10 +30,6 @@ public:
 	Buffer& operator=(const char* str);
 	/// String mode assignment operator, str must be null terminated, encoding name will be "wchar_t"
 	Buffer& operator=(const wchar_t* str);
-	/// common copy constructor
-	Buffer(const Buffer& src);
-	/// common assignment operator
-	Buffer& operator=(const Buffer& src);
 	/// destructor
 	~Buffer();
 
