@@ -84,10 +84,10 @@ public:
 				BSIZE_T srcSafeLength, 
 				BSIZE_T dstOffset = 0);
 	bool	RawCopyTo(
-				const char* dst, 
+				char* dst, 
 				BSIZE_T lengthToCopy)									const;
 	bool	RawCopyTo(
-				const char* dst, 
+				char* dst, 
 				BSIZE_T dstOffset, 
 				BSIZE_T dstSafeLength, 
 				BSIZE_T srcOffset, 
@@ -160,16 +160,16 @@ public:
 				BSIZE_T lengthToCopy,
 				BSIZE_T srcSafeLength,
 				BSIZE_T dstOffset = 0);
-	bool	StrCopyTo(const char* dst, BSIZE_T lengthToCopy)			const;
+	bool	StrCopyTo(char* dst, BSIZE_T lengthToCopy)			const;
 	bool	StrCopyTo(
-				const char* dst,
+				char* dst,
 				BSIZE_T dstOffset,
 				BSIZE_T dstSafeLength,
 				BSIZE_T srcOffset,
 				BSIZE_T lengthToCopy)									const;
-	bool	StrCopyTo(const wchar_t* dst, BSIZE_T lengthToCopy)			const;
+	bool	StrCopyTo(wchar_t* dst, BSIZE_T lengthToCopy)			const;
 	bool	StrCopyTo(
-				const wchar_t* dst,
+				wchar_t* dst,
 				BSIZE_T dstOffset,
 				BSIZE_T dstSafeLength,
 				BSIZE_T srcOffset,
