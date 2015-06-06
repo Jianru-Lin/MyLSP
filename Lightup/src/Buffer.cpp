@@ -8,80 +8,56 @@
 using namespace std;
 
 static default_random_engine random_engine;
-char char_encoding[] = "char";
-char wchar_t_encoding[] = "wchar_t";
 
+#define xchar_encoding "char"
+#define xwchar_t_encoding "wchar_T"
 #define ModeMustBe(M) if (this->mode != M) return false;
 #define VerifyState_RETURN(B) VerifyState(); return B;
 
 Buffer::Buffer(BSIZE_T length)
 {
-	assert(this->mode == Raw);
-	assert(this->rawAddress == NULL);
-	VerifyState();
-	this->rawAddress = Buffer::Alloc(length);
+	char* tmp_rawAddress = Buffer::Alloc(length);
+	assert(length <= 0 && tmp_rawAddress == NULL);
 	// be careful, alloc can be failed
-	if (this->rawAddress != NULL) 
-	{
-		this->rawLength = length;
-	}
-	VerifyState();
+	Construct(Raw, tmp_rawAddress, tmp_rawAddress != NULL ? length : 0, NULL, 0);
 }
 
 Buffer::Buffer()
 {
-	assert(this->mode == Raw);
-	assert(this->rawAddress == NULL);
-	VerifyState();
+	Construct(Raw, NULL, 0, NULL, 0);
 }
 
 Buffer::Buffer(const Buffer& src)
 {
-	if (!CloneFrom(src))
-	{
-		// throw exception here
-		// TODO
-	}
+	Construct(src);
 }
 
 Buffer::Buffer(const char* str)
 {
-	assert(this->mode == Raw);
-	assert(this->rawAddress == NULL);
-	this->mode = String;
-	if (!StrCopyFrom(str, -1))
-	{
-		// throw exception
-		// TODO
-	}
+	Construct(str);
 }
 
 Buffer::Buffer(const wchar_t* str)
 {
-	assert(this->mode == Raw);
-	assert(this->rawAddress == NULL);
-	this->mode = String;
-	if (!StrCopyFrom(str, -1))
-	{
-		// throw exception
-		// TODO
-	}
+	Construct(str);
 }
 
 Buffer& Buffer::operator=(const Buffer& src)
 {
-	if (!CloneFrom(src))
+	// be careful, src can be myself
+	if (this == &src)
 	{
-		// throw exception here
-		// TODO
+		return *this;
 	}
 
+	Destruct();
+	Construct(src);
 	return *this;
 }
 
 Buffer::~Buffer()
 {
-	Clear();
+	Destruct();
 }
 
 BSIZE_T Buffer::RawLength() const
@@ -96,29 +72,15 @@ char* Buffer::RawAddress() const
 
 Buffer& Buffer::operator=(const char* str)
 {
-	this->Clear();
-	this->mode = String;
-	this->strEncoding = char_encoding;
-	if (!this->StrCopyFrom(str, -1))
-	{
-		// oops
-		// throw exception
-		// TODO
-	}
+	Destruct();
+	Construct(str);
 	return *this;
 }
 
 Buffer& Buffer::operator=(const wchar_t* str)
 {
-	this->Clear();
-	this->mode = String;
-	this->strEncoding = wchar_t_encoding;
-	if (!this->StrCopyFrom(str, -1))
-	{
-		// oops
-		// throw exception
-		// TODO
-	}
+	Destruct();
+	Construct(str);
 	return *this;
 }
 
@@ -553,21 +515,28 @@ Buffer& Buffer::_RawView(BSIZE_T pos, BSIZE_T length)
 	return *this;
 }
 
-bool Buffer::StrConvertToEncoding(const Buffer& toEncoding)
+bool Buffer::StrConvertToEncoding(const char* encoding)
 {
-	assert(&toEncoding != this);
 	// TODO
 	return false;
 }
 
-bool Buffer::StrGetEncoding(Buffer& encoding)
+bool Buffer::StrGetEncoding(char*& encoding) const
 {
-	return false;
+	ModeMustBe(String);
+	encoding = this->strEncoding;
+	return true;
 }
 
-bool Buffer::StrSetEncoding(const Buffer& encoding)
+bool Buffer::StrSetEncoding(const char* encoding)
 {
-	return false;
+	ModeMustBe(String);
+	if (this->strEncoding != NULL)
+	{
+		Buffer::Free(&this->strEncoding);
+	}
+	this->strEncoding = Buffer::AllocCopy(encoding, strlen(encoding) + 1);
+	return true;
 }
 
 bool Buffer::isRawMode()
@@ -608,9 +577,17 @@ bool Buffer::isStringMode()
 
 void Buffer::VerifyState() const
 {
+	// rawLength can not be negtive
 	assert(this->rawLength >= 0);
+	// strLength can not be negtive
 	assert(this->strLength >= 0);
-	assert(this->rawAddress != NULL ? this->rawLength > 0 : this->rawLength == 0);
+	// strEncoding can be NULL, but can not be empty string
+	assert(this->strEncoding != NULL && strlen(this->strEncoding) > 0);
+	// rawAddress is NULL then rawLength must be zero
+	// rawAddress is not NULL then rawLength can be zero or positive
+	// , zero means empty string, it's ok
+	assert(this->rawAddress != NULL ? this->rawLength >= 0 : this->rawLength == 0);
+	// if current mode is not string, then strEncoding must be NULL and strLength must be zero
 	assert(this->mode != String ? (this->strEncoding == NULL && this->strLength == 0) : true);
 }
 
@@ -749,26 +726,6 @@ bool Buffer::RawCopyTo(char* dst, BSIZE_T lengthToCopy) const
 	return RawCopyTo(dst, 0, -1, 0, lengthToCopy);
 }
 
-void Buffer::Clear()
-{
-	VerifyState();
-	if (this->mode == Raw)
-	{
-		RawClear();
-	}
-	else if (this->mode == String)
-	{
-		StrClear();
-		this->mode = Raw;
-		RawClear();
-	}
-	else
-	{
-		assert(false);
-	}
-	VerifyState();
-}
-
 bool Buffer::StrCopyFrom(const char* src, BSIZE_T lengthToCopy, BSIZE_T dstOffset /*= 0*/)
 {
 	return StrCopyFrom(src, 0, lengthToCopy, -1, dstOffset);
@@ -778,16 +735,7 @@ bool Buffer::StrCopyFrom(const char* src, BSIZE_T srcOffset, BSIZE_T lengthToCop
 {
 	ModeMustBe(String);
 	VerifyState();
-	if (this->strEncoding == char_encoding)
-	{
-		// same encoding
-		// TODO
-	}
-	else
-	{
-		// different encoding
-		// TODO
-	}
+	// TODO
 	return false;
 }
 
@@ -799,16 +747,7 @@ bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T lengthToCopy, BSIZE_T dstOf
 bool Buffer::StrCopyFrom(const wchar_t* src, BSIZE_T srcOffset, BSIZE_T lengthToCopy, BSIZE_T srcSafeLength, BSIZE_T dstOffset /*= 0*/)
 {
 	VerifyState();
-	if (this->strEncoding == wchar_t_encoding)
-	{
-		// same encoding
-		// TODO
-	}
-	else
-	{
-		// different encoding
-		// TODO
-	}
+	// TODO
 	return false;
 }
 
@@ -904,116 +843,193 @@ bool Buffer::RawSaveToFile(const Buffer& fileName)
 
 bool Buffer::_RawClear()
 {
-	VerifyState();
-	if (this->rawAddress != NULL)
-	{
-		Buffer::Free(&this->rawAddress);
-		this->rawLength = 0;
-	}
-	VerifyState();
+	Destruct();
 	return true;
 }
 
-bool Buffer::RawClear()
-{
-	ModeMustBe(Raw);
-	return _RawClear();
-}
-
-bool Buffer::StrClear()
+bool Buffer::StrAddress(char*& value) const
 {
 	ModeMustBe(String);
-	// clear string mode level state
-	_FreeStrEncoding();
-	this->strLength = 0;
-	// clear raw mode level state
-	_RawClear();
-	return true;
-}
-
-void Buffer::_FreeStrEncoding()
-{
-	if (this->strEncoding == NULL) return;
-	if (this->strEncoding == char_encoding || this->strEncoding == wchar_t_encoding)
+	if (StrIsEncoding(xchar_encoding))
 	{
-		this->strEncoding = NULL;
+		value = this->rawAddress;
+		return true;
 	}
 	else
 	{
-		Buffer::Free(&this->strEncoding);
+		return false;
 	}
 }
 
-bool Buffer::CloneFrom(const Buffer& target)
+bool Buffer::StrAddress(wchar_t*& value) const
 {
-	// ignore clone from self
+	ModeMustBe(String);
+	if (StrIsEncoding(xwchar_t_encoding))
+	{
+		value = (wchar_t*)this->rawAddress;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
-	if (this == &target)
+void Buffer::Construct(Mode _mode, char* _rawAddress, BSIZE_T _rawLength, char* _strEncoding, BSIZE_T _strLength)
+{
+	this->mode = mode;
+	this->rawAddress = _rawAddress;
+	this->rawLength = _rawLength;
+	this->strEncoding = _strEncoding;
+	this->strLength = _strLength;
+}
+
+void Buffer::Construct(const Buffer& src)
+{
+	src.VerifyState();
+	this->VerifyState();
+
+	char* tmp_rawAddress = NULL;
+	if (src.rawAddress != NULL)
+	{
+		tmp_rawAddress = Buffer::AllocCopy(src.rawAddress, src.rawLength);
+		if (tmp_rawAddress == NULL)
+		{
+			// oops, allocate failed
+			// TODO throw exception
+			return;
+		}
+	}
+
+	char* tmp_strEncoding = NULL;
+	if (src.strEncoding != NULL)
+	{
+		tmp_strEncoding = Buffer::AllocCopy(src.strEncoding, strlen(src.strEncoding) + 1);
+		if (tmp_strEncoding == NULL)
+		{
+			// oops, allocate failed
+			// don't forget to free tmp_rawAddress
+			if (tmp_rawAddress != NULL)
+			{
+				Buffer::Free(&tmp_rawAddress);
+			}
+
+			// TODO throw exception
+			return;
+		}
+	}
+
+	Construct(src.mode, tmp_rawAddress, src.rawLength, tmp_strEncoding, src.strLength);
+}
+
+void Buffer::Construct(const char* str)
+{
+	this->VerifyState();
+
+	char*	tmp_rawAddress = NULL;
+	BSIZE_T	tmp_rawLength = 0;
+	char*	tmp_strEncoding = NULL;
+	BSIZE_T	tmp_strLength = 0;
+
+	if (str != NULL)
+	{
+		// str can be empty string, it's ok
+		tmp_strLength = strlen(str);
+		tmp_rawLength = tmp_strLength + 1;
+		tmp_rawAddress = Buffer::AllocCopy(str, tmp_rawLength);
+		if (tmp_rawAddress == NULL)
+		{
+			// oops, allocate failed
+			// TODO throw exception
+			return;
+		}
+	}
+
+	tmp_strEncoding = Buffer::AllocCopy(xchar_encoding, strlen(xchar_encoding) + 1);
+	if (tmp_strEncoding == NULL)
+	{
+		// oops, allocate failed
+		// do not forget to free tmp_rawAddress
+		if (tmp_rawAddress != NULL)
+		{
+			Buffer::Free(&tmp_rawAddress);
+		}
+		// TODO throw exception
+		return;
+	}
+
+	Construct(String, tmp_rawAddress, tmp_rawLength, tmp_strEncoding, tmp_strLength);
+}
+
+void Buffer::Construct(const wchar_t* str)
+{
+	this->VerifyState();
+
+	char*	tmp_rawAddress = NULL;
+	BSIZE_T	tmp_rawLength = 0;
+	char*	tmp_strEncoding = NULL;
+	BSIZE_T	tmp_strLength = 0;
+
+	if (str != NULL)
+	{
+		// str can be empty string, it's ok
+		tmp_strLength = wcslen(str);
+		tmp_rawLength = tmp_strLength * sizeof(wchar_t) + sizeof(wchar_t);
+		tmp_rawAddress = Buffer::AllocCopy((char*)str, tmp_rawLength);
+		if (tmp_rawAddress == NULL)
+		{
+			// oops, allocate failed
+			// TODO throw exception
+			return;
+		}
+	}
+
+	tmp_strEncoding = Buffer::AllocCopy(xwchar_t_encoding, strlen(xwchar_t_encoding) + 1);
+	if (tmp_strEncoding == NULL)
+	{
+		// oops, allocate failed
+		// do not forget to free tmp_rawAddress
+		if (tmp_rawAddress != NULL)
+		{
+			Buffer::Free(&tmp_rawAddress);
+		}
+		// TODO throw exception
+		return;
+	}
+
+	Construct(String, tmp_rawAddress, tmp_rawLength, tmp_strEncoding, tmp_strLength);
+}
+
+void Buffer::Destruct()
+{
+	this->mode = Raw;
+	if (this->rawAddress != NULL)
+	{
+		Buffer::Free(&this->rawAddress);
+	}
+	this->rawLength = 0;
+	if (this->strEncoding != NULL)
+	{
+		Buffer::Free(&this->strEncoding);
+	}
+	this->strLength = 0;
+}
+
+bool Buffer::StrIsEncoding(const char* encoding) const
+{
+	ModeMustBe(String);
+
+	if (this->strEncoding == NULL && encoding == NULL)
 	{
 		return true;
 	}
-
-	target.VerifyState();
-	this->VerifyState();
-
-	// create an tmp buffer for operating
-	// this prevent any status lost when error occursed
-	Buffer tmp;
-	tmp.VerifyState();
-	tmp.mode = target.mode;
-	if (target.rawAddress != NULL)
+	else if (this->strEncoding != NULL && encoding != NULL)
 	{
-		tmp.rawAddress = Buffer::AllocCopy(target.rawAddress, target.rawLength);
-		if (tmp.rawAddress == NULL)
-		{
-			// opps, allocate memory failed
-			// but it's fine, my state won't change
-			return false;
-		}
+		// compare string ignore case
+		return _stricmp(this->strEncoding, encoding) == 0;
 	}
-	tmp.rawLength = target.rawLength;
-	if (!tmp._CopyStrEncodingFrom(target.strEncoding))
+	else
 	{
-		// opps, failed
 		return false;
 	}
-	tmp.strLength = target.strLength;
-	tmp.VerifyState();
-
-	// well, success
-	// swap now
-	this->SwapWith(tmp);
-
-	this->VerifyState();
-
-	// done.
-	return true;
-}
-
-bool Buffer::_CopyStrEncodingFrom(const char* value)
-{
-	this->_FreeStrEncoding();
-	if (value == char_encoding)
-	{
-		this->strEncoding = char_encoding;
-	}
-	else if (value == wchar_t_encoding)
-	{
-		this->strEncoding = wchar_t_encoding;
-	}
-	else if (value != NULL)
-	{
-		char *tmp = Buffer::AllocCopy(value, strlen(value) + 1);
-		if (tmp == NULL)
-		{
-			// allocate memory failed
-			// but it's fine, my state won't change
-			return false;
-		}
-
-		this->strEncoding = tmp;
-	}
-
-	// done.
-	return true;
 }

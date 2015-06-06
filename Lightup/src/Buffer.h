@@ -34,6 +34,18 @@ public:
 	~Buffer();
 
 private:
+	void Construct(const Buffer& src);
+	void Construct(const char* str);
+	void Construct(const wchar_t* str);
+	void Construct(
+		Mode	_mode, 
+		char*	_rawAddress, 
+		BSIZE_T	_rawLength,
+		char*	_strEncoding,
+		BSIZE_T	_strLength);
+	void Destruct();
+
+private:
 	// common
 	Mode	mode = Raw;
 	// raw mode
@@ -55,22 +67,8 @@ private:
 	bool	ConvertMode(Mode toMode);
 
 public:
-	/// clone from another buffer
-	bool	CloneFrom(const Buffer& target);
 	/// swap every thing with target
 	void	SwapWith(Buffer& target);
-	/// free all the resources used in raw mode, 
-	///		won't touch any resources not belongs to raw mode. 
-	///		after invoking (rawAddress == null && rawLength == 0).
-	bool	RawClear();
-	/// free all the resources used in string mode, 
-	///		after invoking (strEncoding == null && strLength == 0), 
-	///		will invoke _RawClear() internally.
-	bool	StrClear();
-	/// free all the resources no matter what mode current is, 
-	///		after invoking (mode == Raw), 
-	//		will invoke _RawClear(), _StrClear() internally.
-	void	Clear();
 
 public:
 	BSIZE_T	RawLength()													const;
@@ -176,13 +174,16 @@ public:
 				BSIZE_T dstSafeLength,
 				BSIZE_T srcOffset,
 				BSIZE_T lengthToCopy)									const;
-	bool	StrGetEncoding(Buffer& encoding);
-	bool	StrSetEncoding(const Buffer& encoding);
+	bool	StrGetEncoding(char*& encoding)								const;
+	bool	StrSetEncoding(const char* encoding);
+	bool	StrIsEncoding(const char* encoding)							const;
 	bool	StrGuessEncoding(const Buffer& encoding);
-	bool	StrConvertToEncoding(const Buffer& toEncoding);
-	bool	StrLength(BSIZE_T& length);
-	bool	StrIsEmpty();
-	bool	StrIndexOf(const Buffer& str, BSIZE_T& pos);
+	bool	StrConvertToEncoding(const char* encoding);
+	bool	StrLength(BSIZE_T& length)									const;
+	bool	StrAddress(char*& value)									const;
+	bool	StrAddress(wchar_t*& value)									const;
+	bool	StrIsEmpty()												const;
+	bool	StrIndexOf(const Buffer& str, BSIZE_T& pos)					const;
 	bool	StrMerge(BSIZE_T pos, const Buffer& buff);
 	bool	StrPrepend(const Buffer& str);
 	bool	StrAppend(const Buffer& str);
@@ -195,11 +196,6 @@ public:
 	bool	StrGet(BSIZE_T pos, wchar_t& c);
 	bool	StrSet(BSIZE_T pos, char c);
 	bool	StrSet(BSIZE_T pos, wchar_t c);
-
-private:
-	// free this->strEncoding then assign it null
-	void	_FreeStrEncoding();
-	bool	_CopyStrEncodingFrom(const char* value);
 
 public:
 	static char*	Alloc(BSIZE_T length);

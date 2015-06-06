@@ -1,6 +1,27 @@
 #include <Lightup.h>
 #include <gtest/gtest.h>
 
+TEST(BufferTest, DefaultConstructor) {
+	Buffer *buf = new Buffer();
+// 	EXPECT_TRUE(buf->isRawMode());
+// 	EXPECT_EQ(buf->RawAddress(), NULL);
+// 	EXPECT_EQ(buf->RawLength(), 0);
+// 
+// 	BSIZE_T len = 0;
+// 	EXPECT_FALSE(buf->StrLength(len));
+	delete buf;
+}
+
+TEST(BufferTest, SizeConstructor) {
+	Buffer *buf = new Buffer((BSIZE_T)0);
+	delete buf;
+}
+
+TEST(BufferTest, CharConstructor) {
+	Buffer *buf = new Buffer("");
+	delete buf;
+}
+
 /*
 TEST(BufferTest, Positive) {
 	Buffer b1(1);
